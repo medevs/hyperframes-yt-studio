@@ -1,0 +1,43 @@
+{
+  "sources": {
+    "rss": [
+      "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
+      "https://arstechnica.com/ai/feed/",
+      "https://www.technologyreview.com/feed/"
+    ],
+    "hackernews": {
+      "min_points": 50,
+      "keywords": ["AI", "LLM", "GPT", "Claude", "Anthropic", "OpenAI", "Gemini", "transformer", "agent"]
+    },
+    "company_blogs": [
+      "https://openai.com/blog/rss.xml",
+      "https://www.anthropic.com/news/rss.xml",
+      "https://deepmind.google/blog/rss.xml",
+      "https://ai.meta.com/blog/rss/"
+    ],
+    "js_rendered_domains": [
+      "openai.com",
+      "anthropic.com",
+      "deepmind.google",
+      "ai.meta.com",
+      "blog.google"
+    ]
+  },
+  "tts": {
+    "voice": "af_nova",
+    "speed": 1.0
+  },
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "target_duration_sec": 240,
+    "render_quality": "standard"
+  },
+  "channel": {
+    "name": "AI Daily",
+    "style_name": "Swiss Pulse",
+    "accent_color": "#0066FF"
+  }
+}
