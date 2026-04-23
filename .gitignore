@@ -9,3 +9,11 @@ snapshots/
 .env.local
 .last-run
 .hyperframes/
+
+# Hyperframes skill installation (tracked via skills-lock.json pin, not source-committed)
+.agents/
+.claude/skills/gsap/
+.claude/skills/hyperframes/
+.claude/skills/hyperframes-cli/
+.claude/skills/hyperframes-registry/
+.claude/skills/website-to-hyperframes/
