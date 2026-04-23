@@ -1,0 +1,11 @@
+node_modules/
+work/
+ready-to-upload/
+archive/
+renders/
+snapshots/
+*.log
+.env
+.env.local
+.last-run
+.hyperframes/
