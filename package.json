@@ -1,0 +1,25 @@
+{
+  "name": "ai-daily-yt",
+  "version": "0.2.0",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "setup": "node pipeline/setup.mjs",
+    "lint": "hyperframes lint",
+    "validate": "hyperframes validate"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "hyperframes": "0.4.15",
+    "jsdom": "^24.0.0",
+    "puppeteer": "^22.0.0",
+    "rss-parser": "^3.13.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
+}
