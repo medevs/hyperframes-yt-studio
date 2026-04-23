@@ -10,8 +10,8 @@ snapshots/
 .last-run
 .hyperframes/
 
-# Hyperframes skill installation (tracked via skills-lock.json pin, not source-committed)
-.agents/
+# Local convenience symlinks into .agents/skills/ (not portable on Windows without core.symlinks).
+# The canonical skill content lives at .agents/skills/ and IS committed.
 .claude/skills/gsap/
 .claude/skills/hyperframes/
 .claude/skills/hyperframes-cli/
