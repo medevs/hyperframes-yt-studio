@@ -11,26 +11,31 @@ const shotsDir = join(workDir, 'screenshots');
 mkdirSync(shotsDir, { recursive: true });
 
 const browser = await puppeteer.launch({ headless: 'new' });
-const entries = [];
-try {
-  for (const pick of picks) {
-    const item = items.find(i => i.id === pick.item_id);
-    if (!item) { entries.push({ item_id: pick.item_id, path: null, fallback: true, source_domain: 'unknown', error: 'item_not_found' }); continue; }
-    const outPath = join(shotsDir, `${item.id}.png`);
-    const domain = new URL(item.external_url).hostname;
-    const page = await browser.newPage();
-    try {
-      await page.setViewport({ width: 1200, height: 400 });
-      await page.setUserAgent('Mozilla/5.0 (compatible; ai-daily-bot/0.2)');
-      await page.goto(item.external_url, { waitUntil: 'networkidle2', timeout: 15000 });
-      await page.screenshot({ path: outPath, clip: { x: 0, y: 0, width: 1200, height: 400 } });
-      entries.push({ item_id: item.id, path: `screenshots/${item.id}.png`, fallback: false, source_domain: domain });
-    } catch (err) {
-      entries.push({ item_id: item.id, path: null, fallback: true, source_domain: domain, error: err.message });
-    } finally {
-      await page.close();
-    }
+
+async function shoot(pick) {
+  const item = items.find(i => i.id === pick.item_id);
+  if (!item) {
+    return { item_id: pick.item_id, path: null, fallback: true, source_domain: 'unknown', error: 'item_not_found' };
   }
+  const outPath = join(shotsDir, `${item.id}.png`);
+  const domain = new URL(item.external_url).hostname;
+  const page = await browser.newPage();
+  try {
+    await page.setViewport({ width: 1200, height: 400 });
+    await page.setUserAgent('Mozilla/5.0 (compatible; ai-daily-bot/0.2)');
+    await page.goto(item.external_url, { waitUntil: 'networkidle2', timeout: 15000 });
+    await page.screenshot({ path: outPath, clip: { x: 0, y: 0, width: 1200, height: 400 } });
+    return { item_id: item.id, path: `screenshots/${item.id}.png`, fallback: false, source_domain: domain };
+  } catch (err) {
+    return { item_id: item.id, path: null, fallback: true, source_domain: domain, error: err.message };
+  } finally {
+    await page.close();
+  }
+}
+
+let entries;
+try {
+  entries = await Promise.all(picks.map(shoot));
 } finally {
   await browser.close();
 }
