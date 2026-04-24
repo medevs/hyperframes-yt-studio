@@ -1,15 +1,19 @@
 ---
 name: yt-script
-description: Write the voiceover script, claims.json, and storyboard.md for today's 3-story AI daily video given picks.json and article texts. Every factual claim must be backed by a verbatim source quote. Use when picks.json exists and you need script.md + storyboard.md + claims.json.
+description: Write the voiceover script, claims.json, storyboard.json, and storyboard.md for today's 3-story AI Daily video, given picks.json and article texts. Every factual claim must be backed by a verbatim source quote that the verifier can match char-for-char. Use whenever picks.json exists and the run needs narration + a storyboard — also when the user says "write the script", "draft the narration", or "storyboard today's stories", even without naming this skill.
 ---
 
 # yt-script
 
-Write `script.md`, `storyboard.md`, and `claims.json` for today's video.
+Write `script.md`, `claims.json`, `storyboard.json`, and `storyboard.md` for today's video.
+
+`storyboard.json` is the canonical contract — `yt-compose` reads it directly. `storyboard.md` is a human-readable companion for the approval gate; it must describe the same scenes and beats as the JSON.
 
 ## Before writing
 
-Read `DESIGN.md` at the repo root — it defines the Swiss Pulse brand. Your storyboard visual direction must align with it. Also read (if not already loaded this session): the `website-to-hyperframes` skill at `.agents/skills/website-to-hyperframes/references/step-4-storyboard.md` for storyboard shape.
+1. Read `DESIGN.md` at the repo root. It defines the **Swiss Pulse** brand — colors, type scale, motion tokens. Every visual choice in the storyboard must trace back to it.
+2. If you haven't loaded the Hyperframes skill this session, invoke it via the Skill tool (`/hyperframes`). Its house-style and motion references are what makes the storyboard usable downstream.
+3. Read every article in full before writing narration. Claims are grounded in article text, not summaries.
 
 ## Inputs
 
@@ -17,11 +21,9 @@ Read `DESIGN.md` at the repo root — it defines the Swiss Pulse brand. Your sto
 - `<run-dir>/items.json` — full item list; use `article_text_path` to read source articles.
 - `DESIGN.md` — brand palette, typography, motion rules.
 
-Read the full article text for each of the 3 picks before writing anything.
-
 ## Tone
 
-- Builder-focused: every story paragraph ends with a sentence answering "what this means for people building with AI" — concrete, not hand-wavy.
+- Builder-focused: every story paragraph ends with one sentence answering *"what this means for people building with AI"* — concrete, not hand-wavy.
 - Skeptical when warranted. Don't repeat press-release hype uncritically.
 - No clickbait. No "you won't believe", no rhetorical audience questions, no "this changes everything".
 - Conversational, short sentences. One idea per sentence.
@@ -36,7 +38,7 @@ Read the full article text for each of the 3 picks before writing anything.
 - STORY 3: 65s / ~160 words
 - OUTRO: 10–15s / ~40 words
 
-Pacing is a hint — actual timing comes from measuring TTS output in Phase 4.
+Pacing is a hint — actual timing comes from measuring TTS output in the render phase.
 
 ## Output 1: `<run-dir>/script.md`
 
@@ -68,10 +70,10 @@ word_count: <your count>
 [^2]: ...
 ```
 
-- **Every factual claim gets a footnote `[^N]`** — numbers, release dates, benchmark results, quotations, names of features, product comparisons. Anything checkable.
+- **Every factual claim gets a footnote `[^N]`** — numbers, release dates, benchmark results, quotations, feature names, product comparisons. Anything checkable.
 - Footnotes are numbered sequentially across the whole script.
 - Every footnote appears in SOURCES with a URL and `item_id`.
-- Do NOT include parenthetical duration hints like `(15s)` in headers — the script timing comes from transcribe, not from your pacing guess.
+- Do NOT include parenthetical duration hints like `(15s)` in headers — timing comes from transcribe, not from pacing guesses.
 
 ## Output 2: `<run-dir>/claims.json`
 
@@ -94,15 +96,21 @@ Schema: `pipeline/schemas/claims.js`. For every footnoted claim, one entry:
 
 ### The absolute rule for `supporting_quote`
 
-**Copy-paste, do not paraphrase.** `supporting_quote` must be a substring of the source article's text, character for character. The verifier (`verify-claims.mjs`) checks this automatically — any mismatch blocks the pipeline.
+**Copy-paste, do not paraphrase.** `supporting_quote` must be a substring of the source article's text, character for character. The verifier (`pipeline/verify-claims.mjs`) checks this automatically — any mismatch blocks the pipeline and wastes a full render iteration.
 
-The verifier normalizes whitespace, smart quotes, dashes, NBSP, HTML entities, and case. It does NOT normalize numeric paraphrase ("3x" vs "three times") or reword. If you can't find a verbatim substring, **rewrite the claim, don't edit the quote**.
+The verifier normalizes whitespace, smart quotes, dashes, NBSP, HTML entities, and case. It does **not** normalize numeric paraphrase ("3x" vs "three times") or rewording. If you can't find a verbatim substring, **rewrite the claim, don't edit the quote** — the claim text can paraphrase freely, only the quote must be exact.
 
-`claim_text` may paraphrase — only `supporting_quote` must be verbatim.
+## Output 3: `<run-dir>/storyboard.json`
 
-## Output 3: `<run-dir>/storyboard.md`
+Schema: `pipeline/schemas/storyboard.js`. This is the machine-readable contract consumed by `yt-compose`.
 
-Per-scene visual direction following Swiss Pulse. 5 scenes: INTRO, STORY 1, STORY 2, STORY 3, OUTRO.
+Five scenes, in order: INTRO, STORY 1, STORY 2, STORY 3, OUTRO. Each scene has beats (timestamped visual events). Required beat kinds: `headline`, `screenshot`, `number_callout`, `label`, `takeaway`, `source_chip`. Required transitions: `cinematic_zoom`, `sdf_iris`, `crossfade`, `hard_cut`.
+
+See `pipeline/schemas/storyboard.js` for the exact Zod schema — it's the source of truth for field names and enums.
+
+## Output 4: `<run-dir>/storyboard.md`
+
+Human-readable sibling of the JSON, for the script-approval gate. Same scenes, same beats, prose-friendly:
 
 ```markdown
 # Storyboard
@@ -135,21 +143,19 @@ Per-scene visual direction following Swiss Pulse. 5 scenes: INTRO, STORY 1, STOR
 - Note: this is the ONLY scene where elements may exit via gsap.to(opacity: 0)
 ```
 
-Write a matching JSON representation at `<run-dir>/storyboard.json` per the schema at `pipeline/schemas/storyboard.js` so downstream tools can read it. The `.md` is for humans; the `.json` is for `yt-compose`.
-
 ## Hard rules
 
 - No claim in the script may be ungrounded. If the article doesn't support it, omit it.
 - Don't invent numbers. If the source rounds, you round the same way.
 - Never mix sources: STORY 1's claims cite STORY 1's source(s) only.
-- Storyboard must follow `DESIGN.md`. No off-palette colors, no non-Inter fonts, no generic motion ("fade in").
+- Storyboard visual direction must follow `DESIGN.md`. No off-palette colors, no non-Inter fonts, no generic motion ("fade in" without an ease tied to DESIGN.md).
+- `storyboard.md` and `storyboard.json` must describe the same 5 scenes in the same order with the same beat content. If they drift, the approval gate and the render will disagree.
 
 ## After writing, validate
 
 ```bash
-node -e "import('./pipeline/schemas/claims.js').then(({ClaimsFileSchema}) => { const d = JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); ClaimsFileSchema.parse(d); console.log('OK claims'); })" <run-dir>/claims.json
-
-node -e "import('./pipeline/schemas/storyboard.js').then(({StoryboardFileSchema}) => { const d = JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); StoryboardFileSchema.parse(d); console.log('OK storyboard'); })" <run-dir>/storyboard.json
+node pipeline/validate-json.mjs claims <run-dir>/claims.json
+node pipeline/validate-json.mjs storyboard <run-dir>/storyboard.json
 ```
 
-Self-check: every `[^N]` in the script appears in SOURCES and in `claims.json`. Every scene in `storyboard.json` has at least one beat.
+Both must print `OK ...`. Then self-check: every `[^N]` in `script.md` appears in SOURCES and in `claims.json`; every scene in `storyboard.json` has at least one beat; `storyboard.md` matches `storyboard.json` scene-for-scene.

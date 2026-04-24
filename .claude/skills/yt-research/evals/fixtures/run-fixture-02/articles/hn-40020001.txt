@@ -1,0 +1,1 @@
+OpenAI today announced o4-turbo, 2.3x faster than o3 on HumanEval at the same price. Context window remains 200K tokens. Available today via the API as o4-turbo-2026-04-23.

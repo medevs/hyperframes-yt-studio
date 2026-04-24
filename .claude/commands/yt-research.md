@@ -9,7 +9,7 @@ Validate:
 
 ```bash
 RUN=$(cat .last-run)
-node -e "import('./pipeline/schemas/picks.js').then(({PicksFileSchema}) => { const d = JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); PicksFileSchema.parse(d); console.log('OK'); })" "$RUN/picks.json"
+node pipeline/validate-json.mjs picks "$RUN/picks.json"
 ```
 
 Report the 3 picks by rank + headline to the user.

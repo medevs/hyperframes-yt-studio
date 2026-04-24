@@ -1,0 +1,92 @@
+{
+  "fetched_at": "2026-04-23T06:00:00Z",
+  "items": [
+    {
+      "id": "hn-40010001",
+      "source": "hackernews",
+      "source_url": "https://news.ycombinator.com/item?id=40010001",
+      "external_url": "https://openai.com/blog/o4-turbo-release",
+      "title": "OpenAI releases o4-turbo: 2.3x faster than o3, same price",
+      "summary": "OpenAI shipped o4-turbo today. Benchmarks show 2.3x speedup over o3 on HumanEval with unchanged pricing at $3/M input tokens.",
+      "published_at": "2026-04-23T03:15:00Z",
+      "signals": { "hn_points": 842, "hn_comments": 312 },
+      "article_text_path": "articles/hn-40010001.txt"
+    },
+    {
+      "id": "hn-40010002",
+      "source": "hackernews",
+      "source_url": "https://news.ycombinator.com/item?id=40010002",
+      "external_url": "https://www.anthropic.com/news/claude-4-7-agents-api",
+      "title": "Anthropic launches Agents API with built-in tool-use orchestration",
+      "summary": "Anthropic's new Agents API handles tool-call loops, memory, and step budgeting server-side. No more custom orchestration code.",
+      "published_at": "2026-04-23T02:00:00Z",
+      "signals": { "hn_points": 631, "hn_comments": 204 },
+      "article_text_path": "articles/hn-40010002.txt"
+    },
+    {
+      "id": "hn-40010003",
+      "source": "hackernews",
+      "source_url": "https://news.ycombinator.com/item?id=40010003",
+      "external_url": "https://mistral.ai/news/mixtral-8x30b-open-weights",
+      "title": "Mistral open-weights Mixtral 8x30B under Apache 2.0",
+      "summary": "Mistral released Mixtral 8x30B weights under Apache 2.0. Beats Llama 3.1 405B on MMLU while fitting on a single H100 at 4-bit.",
+      "published_at": "2026-04-22T22:30:00Z",
+      "signals": { "hn_points": 1204, "hn_comments": 418 },
+      "article_text_path": "articles/hn-40010003.txt"
+    },
+    {
+      "id": "rss-techcrunch-556",
+      "source": "rss",
+      "source_url": "https://techcrunch.com/feed/",
+      "external_url": "https://techcrunch.com/2026/04/22/ai-startup-series-b-250m/",
+      "title": "AI coding assistant startup raises $250M Series B at $3B valuation",
+      "summary": "Series B funding round for another AI coding assistant. No product details beyond 'enterprise focus'.",
+      "published_at": "2026-04-22T18:00:00Z",
+      "signals": { "rss_freshness": 0.88 },
+      "article_text_path": "articles/rss-techcrunch-556.txt"
+    },
+    {
+      "id": "hn-40010005",
+      "source": "hackernews",
+      "source_url": "https://news.ycombinator.com/item?id=40010005",
+      "external_url": "https://simonwillison.net/2026/Apr/22/prompt-injection-still-unsolved/",
+      "title": "Prompt injection is still unsolved — new exploit on GPT-4o's vision input",
+      "summary": "Researchers demonstrate a prompt injection via image metadata that bypasses all current safety fine-tunes in GPT-4o vision.",
+      "published_at": "2026-04-22T16:45:00Z",
+      "signals": { "hn_points": 523, "hn_comments": 187 },
+      "article_text_path": "articles/hn-40010005.txt"
+    },
+    {
+      "id": "rss-verge-889",
+      "source": "rss",
+      "source_url": "https://www.theverge.com/rss/index.xml",
+      "external_url": "https://www.theverge.com/2026/4/22/openai-ceo-twitter-feud",
+      "title": "Sam Altman and Elon Musk trade barbs on X over open-source AI",
+      "summary": "The CEOs exchanged public posts about whether frontier labs should open-source weights. No new policy or product announcements.",
+      "published_at": "2026-04-22T14:00:00Z",
+      "text_extraction_failed": true
+    },
+    {
+      "id": "company-google-deepmind-blog-41",
+      "source": "company_blog",
+      "source_url": "https://deepmind.google/blog/",
+      "external_url": "https://deepmind.google/blog/gemini-2-5-pro-coder",
+      "title": "Gemini 2.5 Pro Coder hits 91% on SWE-bench Verified",
+      "summary": "DeepMind's new coder variant of Gemini 2.5 Pro scores 91% on SWE-bench Verified, a 14-point jump over Gemini 2.5 Pro baseline.",
+      "published_at": "2026-04-22T12:00:00Z",
+      "signals": { "company_official": 1.0 },
+      "article_text_path": "articles/company-google-deepmind-blog-41.txt"
+    },
+    {
+      "id": "hn-40010008",
+      "source": "hackernews",
+      "source_url": "https://news.ycombinator.com/item?id=40010008",
+      "external_url": "https://blog.example.com/ai-will-change-everything-2026",
+      "title": "Why AI will change everything in 2026 — an opinion piece",
+      "summary": "Vague manifesto about AI transformation. No numbers, no product, just speculation.",
+      "published_at": "2026-04-21T20:00:00Z",
+      "signals": { "hn_points": 87, "hn_comments": 54 },
+      "article_text_path": "articles/hn-40010008.txt"
+    }
+  ]
+}

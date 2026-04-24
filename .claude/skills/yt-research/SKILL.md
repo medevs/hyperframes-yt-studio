@@ -1,6 +1,6 @@
 ---
 name: yt-research
-description: Rank and pick the 3 most newsworthy AI/tech stories for a builder-focused daily recap video from a batch of fetched items. Use when items.json exists and you need picks.json.
+description: Rank and pick the 3 most newsworthy AI/tech stories for a builder-focused daily recap video. Use whenever you need to select stories, choose picks, or rank candidates for the AI Daily pipeline — triggered by items.json and producing picks.json. Also use when the user says "pick today's stories", "rank these", or "choose the top 3" in an AI Daily run-dir, even without naming this skill.
 ---
 
 # yt-research
@@ -53,5 +53,7 @@ Write to `<run-dir>/picks.json`. Schema: `pipeline/schemas/picks.js`. Must parse
 ## After writing, validate
 
 ```bash
-node -e "import('./pipeline/schemas/picks.js').then(({PicksFileSchema}) => { const d = JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); PicksFileSchema.parse(d); console.log('OK'); })" <run-dir>/picks.json
+node pipeline/validate-json.mjs picks <run-dir>/picks.json
 ```
+
+The validator prints `OK picks <path>` on success and exits non-zero with field-level errors on failure. Fix errors before handing off to `yt-script`.

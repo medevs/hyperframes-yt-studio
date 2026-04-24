@@ -17,3 +17,8 @@ snapshots/
 .claude/skills/hyperframes-cli/
 .claude/skills/hyperframes-registry/
 .claude/skills/website-to-hyperframes/
+
+# Skill eval workspaces — regeneratable; re-run grade_runs.mjs + build_benchmark.mjs to rebuild.
+.claude/skills/*-workspace/
+.claude/skills/review.html
+.claude/skills/combined_benchmark.json

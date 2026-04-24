@@ -1,0 +1,57 @@
+{
+  "fetched_at": "2026-04-24T06:00:00Z",
+  "items": [
+    {
+      "id": "hn-40020001",
+      "source": "hackernews",
+      "source_url": "https://news.ycombinator.com/item?id=40020001",
+      "external_url": "https://openai.com/blog/o4-turbo-release",
+      "title": "OpenAI releases o4-turbo: 2.3x faster than o3, same price",
+      "summary": "OpenAI shipped o4-turbo today. Benchmarks show 2.3x speedup over o3 on HumanEval.",
+      "published_at": "2026-04-24T03:15:00Z",
+      "signals": { "hn_points": 842 },
+      "article_text_path": "articles/hn-40020001.txt"
+    },
+    {
+      "id": "hn-40020002",
+      "source": "hackernews",
+      "source_url": "https://news.ycombinator.com/item?id=40020002",
+      "external_url": "https://mistral.ai/news/mixtral-8x30b-open-weights",
+      "title": "Mistral open-weights Mixtral 8x30B under Apache 2.0",
+      "summary": "Mistral released Mixtral 8x30B weights under Apache 2.0.",
+      "published_at": "2026-04-24T02:00:00Z",
+      "signals": { "hn_points": 1204 },
+      "article_text_path": "articles/hn-40020002.txt"
+    },
+    {
+      "id": "rss-a",
+      "source": "rss",
+      "source_url": "https://example.com/rss",
+      "external_url": "https://example.com/a",
+      "title": "Paywalled article A",
+      "summary": "Behind paywall.",
+      "published_at": "2026-04-24T01:00:00Z",
+      "text_extraction_failed": true
+    },
+    {
+      "id": "rss-b",
+      "source": "rss",
+      "source_url": "https://example.com/rss",
+      "external_url": "https://example.com/b",
+      "title": "Paywalled article B",
+      "summary": "Behind paywall.",
+      "published_at": "2026-04-23T22:00:00Z",
+      "text_extraction_failed": true
+    },
+    {
+      "id": "rss-c",
+      "source": "rss",
+      "source_url": "https://example.com/rss",
+      "external_url": "https://example.com/c",
+      "title": "Paywalled article C",
+      "summary": "Behind paywall.",
+      "published_at": "2026-04-23T20:00:00Z",
+      "text_extraction_failed": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "audio_file": "narration.wav",
+  "total_duration_sec": 242.4,
+  "scenes": [
+    { "id": "intro",   "kind": "intro", "start_sec": 0.0,    "duration_sec": 15.2, "word_count": 42 },
+    { "id": "story-1", "kind": "story", "story_num": 1, "start_sec": 15.2,   "duration_sec": 78.4, "word_count": 188 },
+    { "id": "story-2", "kind": "story", "story_num": 2, "start_sec": 93.6,   "duration_sec": 72.1, "word_count": 172 },
+    { "id": "story-3", "kind": "story", "story_num": 3, "start_sec": 165.7,  "duration_sec": 64.9, "word_count": 158 },
+    { "id": "outro",   "kind": "outro", "start_sec": 230.6,  "duration_sec": 11.8, "word_count": 38 }
+  ],
+  "words": [
+    { "text": "today",   "start_sec": 0.32, "end_sec": 0.71 },
+    { "text": "on",      "start_sec": 0.74, "end_sec": 0.88 },
+    { "text": "AI",      "start_sec": 0.90, "end_sec": 1.12 },
+    { "text": "Daily",   "start_sec": 1.14, "end_sec": 1.58 },
+    { "text": "Mixtral", "start_sec": 15.4, "end_sec": 16.1 },
+    { "text": "Anthropic","start_sec": 93.8, "end_sec": 94.6 },
+    { "text": "Gemini",  "start_sec": 165.9, "end_sec": 166.5 },
+    { "text": "subscribe","start_sec": 231.0, "end_sec": 231.8 }
+  ]
+}

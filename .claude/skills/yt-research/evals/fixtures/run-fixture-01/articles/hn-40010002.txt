@@ -1,0 +1,16 @@
+Anthropic today launched its Agents API, a higher-level abstraction on top of the Claude API that handles tool-call loops, memory, and step budgeting server-side.
+
+"Most teams building on Claude end up writing the same orchestration code," said Anthropic product lead Jane Chen. "Agents API bakes that in — you describe the tools, we run the loop."
+
+Key features:
+- Built-in tool-call loop with automatic retry and error recovery
+- Persistent memory that survives across invocations, scoped per agent instance
+- Step budgeting: cap an agent to a maximum number of tool calls or wall-clock seconds
+- Observability hooks for per-step logging and evaluation
+- Support for parallel sub-agents via a new spawn() primitive
+
+The Agents API is built on Claude Opus 4.7 and Claude Sonnet 4.6. Pricing is the same per-token rate as the underlying models, with a flat $0.002 per tool-call orchestration fee that Anthropic says covers the memory and scheduling infrastructure.
+
+A code example shown at the launch compared 180 lines of custom orchestration code to a 22-line definition using the new API.
+
+The service is in public beta today. General availability is planned for Q3 2026.

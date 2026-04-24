@@ -1,0 +1,13 @@
+Researchers at the University of Edinburgh and Carnegie Mellon have published a new prompt-injection attack targeting GPT-4o's vision input.
+
+The attack works by embedding adversarial instructions into the EXIF metadata of images. When GPT-4o is asked to describe or analyze an image, the model parses the metadata and treats instructions there as part of its system prompt, overriding safety fine-tunes.
+
+In the researchers' test set of 500 images, the injection succeeded 73% of the time at making the model reveal its system prompt, and 41% of the time at making it produce content that violated OpenAI's usage policy.
+
+"The concerning part is that the user never sees this metadata," said lead author Maria Schenk. "A user uploads what looks like a normal photo, and the model obeys an instruction the user didn't write."
+
+The paper, available on arXiv, was disclosed to OpenAI under a 90-day embargo that ended today. OpenAI has not yet patched the vulnerability. An OpenAI spokesperson said in an email that "we are aware of the research and are evaluating mitigations."
+
+The paper argues that prompt injection, first discussed in 2022, remains fundamentally unsolved. "Every time a safety fine-tune closes one channel, another channel opens," the authors write. "Input segregation at the architecture level is the only durable fix."
+
+The attack was tested on GPT-4o, Claude 3.5 Sonnet, and Gemini 1.5 Pro. All three were vulnerable, though success rates differed. The full attack code is available on GitHub under a research-use-only license.
