@@ -1,0 +1,9 @@
+An AI coding assistant startup has raised $250 million in a Series B round at a post-money valuation of $3 billion, according to a source familiar with the deal.
+
+The round was led by a tier-one Silicon Valley venture firm with participation from a sovereign wealth fund and several strategic corporate investors. Neither the startup nor the lead investor responded to requests for comment.
+
+The company, founded in 2023, is focused on "enterprise-grade" AI coding assistants. It has not disclosed a customer list or product specifics publicly. Its website describes the product as "an AI pair programmer for regulated industries" with features including "SOC 2 compliance, VPC deployment, and zero data retention."
+
+The AI coding assistant market has seen heavy funding activity over the past 12 months, with at least four companies in the space now valued at over $2 billion. Analysts say consolidation is likely as differentiation becomes harder and switching costs for developers remain low.
+
+This story will be updated if the company provides a statement.

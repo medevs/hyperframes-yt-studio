@@ -1,0 +1,35 @@
+{
+  "date": "2026-04-23",
+  "picks": [
+    {
+      "rank": 1,
+      "item_id": "hn-40010003",
+      "angle": "Mixtral 8x30B is the first open-weights model that beats Llama 3.1 405B on MMLU while fitting on a single H100 at 4-bit — your local-inference budget just got better.",
+      "rationale": "Open-weights, Apache 2.0, H100-single-box at 4-bit — exactly the kind of release that changes what builders can self-host. Stronger story than o4-turbo since it's a new floor, not a marginal speedup.",
+      "suggested_visuals": ["MMLU bar chart vs Llama 3.1 405B", "H100 memory envelope diagram", "Apache 2.0 license header"],
+      "risk_flags": []
+    },
+    {
+      "rank": 2,
+      "item_id": "hn-40010002",
+      "angle": "Anthropic's Agents API moves the tool-call loop, memory, and step budgeting server-side — 180 lines of custom orchestration become 22 lines of declaration.",
+      "rationale": "Directly changes how builders architect agentic systems on Claude. The 180-to-22-line delta is concrete and the step-budget primitive is new.",
+      "suggested_visuals": ["before/after code comparison", "API pricing: $0.002 per orchestration", "agent step budget UI mock"],
+      "risk_flags": []
+    },
+    {
+      "rank": 3,
+      "item_id": "company-google-deepmind-blog-41",
+      "angle": "Gemini 2.5 Pro Coder hits 91.2% on SWE-bench Verified — a 14-point jump with a 2M-token context optimized for codebase navigation.",
+      "rationale": "New SOTA on a benchmark builders actually watch. The eval-harness release makes the number independently checkable, which helps separate it from hype.",
+      "suggested_visuals": ["SWE-bench Verified leaderboard", "2M token context visualization", "codebase-map tool diagram"],
+      "risk_flags": []
+    }
+  ],
+  "rejected": [
+    { "item_id": "hn-40010001", "reason": "o4-turbo is a speedup, not a capability change — lower news value than the top 3 picks." },
+    { "item_id": "hn-40010005", "reason": "Prompt-injection exploit is important but the research angle fits better in a weekly recap than today's builder-focused slot." },
+    { "item_id": "rss-techcrunch-556", "reason": "Funding round with no product substance — explicitly deprioritized by the skill brief." },
+    { "item_id": "hn-40010008", "reason": "Vague opinion piece, no concrete claims." }
+  ]
+}

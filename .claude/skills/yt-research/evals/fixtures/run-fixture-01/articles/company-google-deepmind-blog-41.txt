@@ -1,0 +1,19 @@
+Today we're announcing Gemini 2.5 Pro Coder, a specialized variant of Gemini 2.5 Pro fine-tuned for software engineering tasks.
+
+On SWE-bench Verified, Gemini 2.5 Pro Coder scores 91.2%, a 14-point improvement over the Gemini 2.5 Pro baseline of 77.1%. The model is also 38% faster on end-to-end task completion thanks to a new speculative code-execution feature that runs candidate patches in parallel.
+
+Gemini 2.5 Pro Coder is available in preview today via the Gemini API under the model ID gemini-2-5-pro-coder. Pricing matches the base Gemini 2.5 Pro tier.
+
+The new model is optimized for:
+- Multi-file refactoring tasks that touch 10+ files
+- Fault localization from test failures and stack traces
+- Long-horizon coding agents operating over 30+ minutes
+
+Key improvements over the base model:
+1. Fine-tuned on 2.4M real-world PR diffs from permissively licensed repositories
+2. Context window expanded to 2M tokens specifically for codebase navigation
+3. New "codebase map" tool that prebuilds a symbol index before agentic tasks
+
+We're rolling out Gemini 2.5 Pro Coder through Google AI Studio and Vertex AI today. General availability will begin in 30 days once we've completed red-team testing with launch partners.
+
+We're also releasing the evaluation harness and the 8,400 held-out SWE-bench Verified problems used in our evaluation, so that researchers can reproduce our numbers independently.

@@ -1,0 +1,17 @@
+Mistral AI released Mixtral 8x30B today under the Apache 2.0 license.
+
+The mixture-of-experts model has 240B total parameters with 60B active per token. On MMLU, it scores 87.4 — a 1.2 point improvement over Llama 3.1 405B, at roughly one-seventh the active-parameter count.
+
+In 4-bit quantization, Mixtral 8x30B fits on a single H100 with 80GB of VRAM at 12 tokens per second. An 8-bit variant runs at 9 tokens per second on two H100s.
+
+"We think open weights with no strings attached is the right default for models that the research community will use to build the next thing," Mistral CEO Arthur Mensch wrote in the release post. "Apache 2.0 means no royalties, no usage caps, no attribution requirement beyond the license text."
+
+Training compute was disclosed: approximately 1.8 × 10^25 FLOPs, trained over 11 weeks on a cluster of 2,048 H100 GPUs. The training data mix was not disclosed in detail but Mistral says it includes "predominantly high-quality curated text" and excludes copyrighted books.
+
+Benchmarks provided in the technical report:
+- MMLU: 87.4
+- HumanEval: 82.1
+- GSM8K: 94.2
+- MATH: 58.6
+
+Downloads are available on Hugging Face and via Mistral's own CDN. A GGUF-converted set of quantizations is promised "within the week."

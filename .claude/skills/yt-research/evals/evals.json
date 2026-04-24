@@ -1,0 +1,19 @@
+{
+  "skill_name": "yt-research",
+  "evals": [
+    {
+      "id": 0,
+      "name": "normal-run-of-8-items",
+      "prompt": "Pick the 3 stories for today's AI Daily video. The run folder is at C:/Users/ahmed.oublihi/Projects/studio/.claude/skills/yt-research/evals/fixtures/run-fixture-01/. Read items.json there (8 candidates) and the article texts under articles/. The output picks.json must follow the Zod schema at C:/Users/ahmed.oublihi/Projects/studio/pipeline/schemas/picks.js. Audience: developers shipping AI products.",
+      "expected_output": "A picks.json with exactly 3 picks ranked 1-3, referencing only item_ids that exist in items.json, skipping any item with text_extraction_failed=true. Must pass pipeline/schemas/picks.js validation. Should also include a rejected[] array explaining why other strong candidates weren't picked.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "insufficient-usable-items",
+      "prompt": "Pick the 3 stories for today's AI Daily video. Run folder: C:/Users/ahmed.oublihi/Projects/studio/.claude/skills/yt-research/evals/fixtures/run-fixture-02/. Read items.json and the article texts under articles/. Schema for the output: C:/Users/ahmed.oublihi/Projects/studio/pipeline/schemas/picks.js.",
+      "expected_output": "The fixture only contains 2 items with usable article text (the other 3 have text_extraction_failed=true). The correct behavior is to STOP and report that fewer than 3 usable items exist. Writing a 3-pick picks.json with a fabricated third pick is the failure mode we are testing for.",
+      "files": []
+    }
+  ]
+}

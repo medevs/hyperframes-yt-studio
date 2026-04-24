@@ -1,0 +1,1 @@
+Mistral released Mixtral 8x30B under the Apache 2.0 license. 240B total parameters, 60B active per token. MMLU 87.4. Fits on a single H100 at 4-bit.

@@ -1,6 +1,6 @@
 ---
 name: yt-metadata
-description: Generate YouTube title, description with chapter timestamps, and tags for today's AI Daily video. Use after script.md + timings.json exist.
+description: Generate the YouTube title, description (with chapter timestamps), and tags for today's AI Daily video. Use whenever script.md, picks.json, and timings.json exist in the run-dir and the video is ready to describe — also when the user says "write the youtube metadata", "generate chapters", "draft the upload copy", or "what's the title" for an AI Daily run.
 ---
 
 # yt-metadata
@@ -9,9 +9,9 @@ Write `<run-dir>/metadata.txt` for manual YouTube upload.
 
 ## Inputs
 
-- `<run-dir>/script.md`
-- `<run-dir>/picks.json`
-- `<run-dir>/timings.json`
+- `<run-dir>/script.md` — narration and SOURCES list
+- `<run-dir>/picks.json` — per-story titles and source metadata
+- `<run-dir>/timings.json` — authoritative scene start times
 
 ## Output
 
@@ -46,7 +46,7 @@ TAGS: tag1, tag2, tag3, ...
 
 ### Chapters
 
-Take each scene's `start_sec` from `timings.json` and format as `MM:SS` (floor to seconds).
+Take each scene's `start_sec` from `timings.json` and format as `MM:SS` (floor to seconds). The chapter label for each story comes from the `picks.json` angle or a short version of the story's headline — not from guessing.
 
 ### Tags
 
@@ -54,6 +54,7 @@ Take each scene's `start_sec` from `timings.json` and format as `MM:SS` (floor t
 
 ## Hard rules
 
-- Chapter timestamps must match `timings.json` exactly.
-- Every URL in Sources must appear in the script's SOURCES section.
+- Chapter timestamps must match `timings.json` exactly — they are what YouTube uses, not your estimates.
+- Every URL in Sources must appear in the script's SOURCES section. No extra URLs, no missing ones.
 - No emoji.
+- First chapter must be exactly `00:00 Intro` — YouTube rejects chapter lists that don't start at 0:00.

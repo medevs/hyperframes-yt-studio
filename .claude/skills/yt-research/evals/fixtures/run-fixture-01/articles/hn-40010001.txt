@@ -1,0 +1,13 @@
+OpenAI today announced o4-turbo, a new model in the o-series reasoning line.
+
+On internal benchmarks, o4-turbo is 2.3x faster than o3 on HumanEval and 1.9x faster on GPQA while scoring within 1 point on both. Pricing is unchanged at $3 per million input tokens and $15 per million output tokens.
+
+"o4-turbo is designed for production workloads where latency matters," said OpenAI president Greg Brockman. "We wanted to give developers a drop-in replacement for o3 that's noticeably snappier without asking them to re-budget."
+
+Context window remains at 200K tokens. Function calling, structured outputs, and vision are all supported. The model is available today via the API under the ID o4-turbo-2026-04-23.
+
+Rate limits are doubled compared to o3 across all tiers. Enterprise customers on the Priority tier get a dedicated capacity pool during the first week of rollout.
+
+No new safety fine-tunes are described in today's release. OpenAI says the safety profile is "materially identical" to o3 and points to its updated system card for details.
+
+The company also noted that o4-turbo will be the default model powering ChatGPT's Plus tier starting next week.
