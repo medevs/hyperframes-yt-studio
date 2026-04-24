@@ -10,19 +10,8 @@
       "min_points": 50,
       "keywords": ["AI", "LLM", "GPT", "Claude", "Anthropic", "OpenAI", "Gemini", "transformer", "agent"]
     },
-    "company_blogs": [
-      "https://openai.com/blog/rss.xml",
-      "https://www.anthropic.com/news/rss.xml",
-      "https://deepmind.google/blog/rss.xml",
-      "https://ai.meta.com/blog/rss/"
-    ],
-    "js_rendered_domains": [
-      "openai.com",
-      "anthropic.com",
-      "deepmind.google",
-      "ai.meta.com",
-      "blog.google"
-    ]
+    "company_blogs": [],
+    "js_rendered_domains": []
   },
   "tts": {
     "voice": "af_nova",
