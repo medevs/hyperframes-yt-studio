@@ -1,27 +1,35 @@
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import Parser from 'rss-parser';
 import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
-import { loadConfig, isJsRenderedDomain } from './lib/sources.js';
+import { loadConfig } from './lib/sources.js';
 import { dedupItems } from './lib/dedup.js';
+import { capItems } from './lib/cap-items.js';
+import { parallelFetch } from './lib/parallel-fetch.js';
 import { ItemsFileSchema } from './schemas/items.js';
+
+const ITEM_CAP = 50;
+const FETCH_CONCURRENCY = 8;
+const FETCH_TIMEOUT_MS = 10000;
+const MIN_ARTICLE_CHARS = 500;
+const MIN_USABLE_ITEMS = 10;
 
 const [, , workDir] = process.argv;
 if (!workDir) { console.error('usage: node fetch-sources.mjs <work-dir>'); process.exit(2); }
 
 const config = loadConfig();
 const parser = new Parser();
-const articlesDir = join(workDir, 'articles');
-mkdirSync(articlesDir, { recursive: true });
 const fetchErrors = [];
+
+const shortHash = (s) => createHash('sha256').update(s).digest('hex').slice(0, 16);
 
 async function fetchRss(url, source) {
   try {
     const feed = await parser.parseURL(url);
     return feed.items.map(e => ({
-      id: `${source}-${Buffer.from(e.link || e.guid || e.title).toString('base64').slice(0, 20)}`,
+      id: `${source}-${shortHash(e.link || e.guid || e.title)}`,
       source,
       source_url: e.link ?? url,
       external_url: e.link ?? url,
@@ -57,39 +65,16 @@ async function fetchHackerNews({ min_points, keywords }) {
   }
 }
 
-async function plainFetchAndExtract(url) {
-  const r = await fetch(url, { headers: { 'user-agent': 'ai-daily-bot/0.2' } });
-  const html = await r.text();
-  const dom = new JSDOM(html, { url });
-  return new Readability(dom.window.document).parse()?.textContent?.trim() ?? '';
-}
-
-function jsRenderedFetch(url, outPath) {
-  const res = spawnSync('node', ['pipeline/fetch-article-text.mjs', url, outPath], {
-    encoding: 'utf8',
-    shell: false,
-    stdio: ['ignore', 'inherit', 'inherit'],
-    timeout: 60000,
-  });
-  return res.status === 0;
-}
-
-async function extractArticleText(item) {
-  const outPath = join(articlesDir, `${item.id}.txt`);
+function extractText(html, url) {
   try {
-    if (isJsRenderedDomain(item.external_url, config.sources.js_rendered_domains)) {
-      if (!jsRenderedFetch(item.external_url, outPath)) return { failed: true };
-    } else {
-      const text = await plainFetchAndExtract(item.external_url);
-      if (text.length < 500) return { failed: true };
-      writeFileSync(outPath, text, 'utf8');
-    }
-    return { failed: false, path: `articles/${item.id}.txt` };
-  } catch (err) {
-    fetchErrors.push({ source: 'article_extraction', url: item.external_url, error: err.message });
-    return { failed: true };
+    const dom = new JSDOM(html, { url });
+    return new Readability(dom.window.document).parse()?.textContent?.trim() ?? '';
+  } catch {
+    return '';
   }
 }
+
+mkdirSync(join(workDir, 'articles'), { recursive: true });
 
 const rssResults = await Promise.all([
   ...config.sources.rss.map(u => fetchRss(u, 'rss')),
@@ -98,24 +83,38 @@ const rssResults = await Promise.all([
 const hn = await fetchHackerNews(config.sources.hackernews);
 const raw = [...rssResults.flat(), ...hn];
 const deduped = dedupItems(raw);
+const capped = capItems(deduped, ITEM_CAP);
 
-const enriched = [];
-for (const item of deduped) {
-  const r = await extractArticleText(item);
-  enriched.push(r.failed
-    ? { ...item, text_extraction_failed: true }
-    : { ...item, article_text_path: r.path });
-}
+const urls = capped.map(i => i.external_url);
+const fetched = await parallelFetch(urls, {
+  concurrency: FETCH_CONCURRENCY,
+  timeoutMs: FETCH_TIMEOUT_MS,
+});
+
+const enriched = capped.map((item, i) => {
+  const r = fetched[i];
+  if (!r.ok) {
+    fetchErrors.push({ source: 'article_extraction', url: item.external_url, error: r.error ?? `status ${r.status}` });
+    return { ...item, text_extraction_failed: true };
+  }
+  const text = extractText(r.body, item.external_url);
+  if (text.length < MIN_ARTICLE_CHARS) {
+    fetchErrors.push({ source: 'article_extraction', url: item.external_url, error: `text too short (${text.length} chars)` });
+    return { ...item, text_extraction_failed: true };
+  }
+  const relPath = `articles/${item.id}.txt`;
+  writeFileSync(join(workDir, relPath), text, 'utf8');
+  return { ...item, article_text_path: relPath };
+});
 
 const usable = enriched.filter(i => !i.text_extraction_failed);
-if (usable.length < 10) {
-  console.error(`ERROR: only ${usable.length} items with usable article text (need >=10)`);
-  writeFileSync(join(workDir, 'fetch-errors.json'), JSON.stringify(fetchErrors, null, 2));
-  process.exit(1);
-}
-
 const out = { fetched_at: new Date().toISOString(), items: enriched };
 ItemsFileSchema.parse(out);
 writeFileSync(join(workDir, 'items.json'), JSON.stringify(out, null, 2));
 writeFileSync(join(workDir, 'fetch-errors.json'), JSON.stringify(fetchErrors, null, 2));
-console.log(`OK ${enriched.length} items (${usable.length} with usable text) -> ${workDir}/items.json`);
+
+if (usable.length < MIN_USABLE_ITEMS) {
+  console.error(`ERROR: only ${usable.length} items with usable article text (need >=${MIN_USABLE_ITEMS})`);
+  process.exit(1);
+}
+console.log(`OK ${enriched.length} items (${usable.length} with usable text, capped from ${deduped.length}) -> ${workDir}/items.json`);
