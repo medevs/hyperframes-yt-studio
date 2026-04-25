@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-// 'news' is reserved for future use (e.g., distinguishing news-article og:images from primary-source og:images).
-// The current capture pipeline emits only 'primary', 'og_image', and 'headline_card'.
-export const SourceKindSchema = z.enum(['primary', 'news', 'og_image', 'headline_card']);
+export const SourceKindSchema = z.enum(['primary', 'og_image', 'headline_card']);
 
 export const ScreenshotsManifestSchema = z.object({
   entries: z.array(z.object({
