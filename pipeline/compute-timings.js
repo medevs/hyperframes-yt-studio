@@ -19,10 +19,14 @@ export function alignSectionsToWords(sections, words) {
     if (tokens.length === 0) continue;
 
     // Find the first occurrence of tokens[0] in normWords at or after wi.
+    // Whisper sometimes drops apostrophes ("Anthropic's" -> "Anthropics"), so also
+    // accept matches after both sides strip apostrophes.
     const firstWord = tokens[0];
+    const firstWordNoAp = firstWord.replace(/'/g, '');
     let start = -1;
     for (let j = wi; j < normWords.length; j++) {
-      if (normWords[j].norm === firstWord) { start = j; break; }
+      const w = normWords[j].norm;
+      if (w === firstWord || w.replace(/'/g, '') === firstWordNoAp) { start = j; break; }
     }
     if (start === -1) throw new Error(`cannot locate section ${id} starting with "${firstWord}" at word index >= ${wi}`);
 
