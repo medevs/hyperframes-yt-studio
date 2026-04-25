@@ -94,6 +94,8 @@ if (typeof window !== 'undefined') {
       const end = parseFloat(cap.dataset.end);
       tl.fromTo(cap, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, ease: 'power3.out' }, at);
       tl.to(cap, { opacity: 0, duration: 0.15, ease: 'power2.in' }, end - 0.15);
+      // Deterministic hard-kill at end so seeking past the caption window doesn't leave it visible.
+      tl.set(cap, { opacity: 0 }, end);
     });
   };
 
