@@ -4,12 +4,25 @@ ready-to-upload/
 archive/
 renders/
 snapshots/
+coverage/
+dist/
+build/
 *.log
 .env
-.env.local
+.env.*
+!.env.example
 .last-run
 .hyperframes/
 .worktrees/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
 
 # Internal development notes — handoffs, planning, design specs.
 # Kept locally for reference; not part of the public OSS surface.
