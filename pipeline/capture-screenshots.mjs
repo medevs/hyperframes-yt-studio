@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer';
 import sharp from 'sharp';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadConfig } from './lib/sources.js';
 import { fetchOgImage } from './lib/og-image.mjs';
@@ -106,6 +106,10 @@ async function shoot(pick) {
     if (og) {
       const buf = readFileSync(og.path);
       const meta = await sharp(buf).metadata();
+      if (!meta.width || !meta.height) {
+        console.warn(`[${item.id}] og:image has no usable dimensions, falling through`);
+        throw new Error('og:image missing dimensions');
+      }
       writeFileSync(outPath, buf);
       return { item_id: item.id, path: `screenshots/${item.id}.png`, fallback: false,
                source_domain: domainOf(primaryUrl), width: meta.width, height: meta.height,
@@ -121,6 +125,10 @@ async function shoot(pick) {
     if (og) {
       const buf = readFileSync(og.path);
       const meta = await sharp(buf).metadata();
+      if (!meta.width || !meta.height) {
+        console.warn(`[${item.id}] og:image has no usable dimensions, falling through`);
+        throw new Error('og:image missing dimensions');
+      }
       writeFileSync(outPath, buf);
       return { item_id: item.id, path: `screenshots/${item.id}.png`, fallback: false,
                source_domain: domainOf(newsUrl), width: meta.width, height: meta.height,
