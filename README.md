@@ -126,12 +126,6 @@ npx skills add heygen-com/hyperframes
 
 Core skills used: `hyperframes`, `hyperframes-cli`, `hyperframes-registry`, `website-to-hyperframes`, `gsap`, plus project skills `yt-research`, `yt-script`, `yt-compose`, `yt-metadata`.
 
-## Plans and history
-
-- Active plan: `docs/superpowers/plans/2026-04-23-yt-news-automation-v2.md`
-- Design spec: `docs/superpowers/specs/2026-04-23-yt-news-automation-design.md`
-- Superseded v1 (kept for history): `docs/superpowers/plans/2026-04-23-yt-news-automation.md`
-
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
