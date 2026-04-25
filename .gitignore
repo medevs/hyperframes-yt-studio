@@ -11,6 +11,10 @@ snapshots/
 .hyperframes/
 .worktrees/
 
+# Internal development notes — handoffs, planning, design specs.
+# Kept locally for reference; not part of the public OSS surface.
+docs/
+
 # Local convenience symlinks into .agents/skills/ (not portable on Windows without core.symlinks).
 # The canonical skill content lives at .agents/skills/ and IS committed.
 .claude/skills/gsap/
@@ -23,3 +27,6 @@ snapshots/
 .claude/skills/*-workspace/
 .claude/skills/review.html
 .claude/skills/combined_benchmark.json
+
+# Per-user Claude Code overrides
+.claude/settings.local.json
