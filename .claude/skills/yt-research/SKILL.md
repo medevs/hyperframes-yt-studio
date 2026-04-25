@@ -53,7 +53,7 @@ Write to `<run-dir>/picks.json`. Schema: `pipeline/schemas/picks.js`. Must parse
   - `angle` — one sentence: the builder-focused hook
   - `rationale` — 1–2 sentences: why this over alternatives
   - `suggested_visuals` — 2–3 short strings (e.g. `["benchmark chart", "API changelog"]`)
-  - `primary_source_url` — canonical announcement URL per story (see guidance below)
+  - `primary_source_url` — canonical announcement URL per story (see above for guidance)
   - `risk_flags` — any of: `"rumor_only"`, `"single_source"`, `"unverifiable_claim"`, `"potential_copyright"`. Empty if none apply.
 - `rejected` — any strong-but-not-picked candidates with a short reason.
 
