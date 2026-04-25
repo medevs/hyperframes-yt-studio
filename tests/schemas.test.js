@@ -66,3 +66,34 @@ describe('ConfigSchema', () => {
     expect(() => ConfigSchema.parse(raw)).not.toThrow();
   });
 });
+
+describe('PickSchema primary_source_url', () => {
+  const base = {
+    rank: 1,
+    item_id: 'rss-x',
+    angle: 'a',
+    rationale: 'r',
+    suggested_visuals: [],
+    risk_flags: [],
+  };
+
+  it('requires primary_source_url', () => {
+    expect(() => {
+      const { PickSchema } = require('../pipeline/schemas/picks.js');
+      PickSchema.parse(base);
+    }).toThrow();
+  });
+
+  it('rejects non-URL primary_source_url', () => {
+    expect(() => {
+      const { PickSchema } = require('../pipeline/schemas/picks.js');
+      PickSchema.parse({ ...base, primary_source_url: 'not-a-url' });
+    }).toThrow();
+  });
+
+  it('accepts a valid primary_source_url', () => {
+    const { PickSchema } = require('../pipeline/schemas/picks.js');
+    const ok = PickSchema.parse({ ...base, primary_source_url: 'https://openai.com/blog/x' });
+    expect(ok.primary_source_url).toBe('https://openai.com/blog/x');
+  });
+});
