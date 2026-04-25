@@ -113,3 +113,30 @@ describe('ConfigSchema screenshot_overrides', () => {
     expect(() => ConfigSchema.parse(cfg)).toThrow();
   });
 });
+
+describe('ScreenshotsManifestSchema width/height/source_kind', () => {
+  it('requires width, height, source_kind on each entry', () => {
+    const bad = { entries: [{ item_id: 'x', path: 'p.png', fallback: false, source_domain: 'd' }] };
+    expect(() => ScreenshotsManifestSchema.parse(bad)).toThrow();
+  });
+
+  it('accepts a valid entry', () => {
+    const good = {
+      entries: [{
+        item_id: 'x', path: 'p.png', fallback: false, source_domain: 'd',
+        width: 1200, height: 2400, source_kind: 'primary',
+      }],
+    };
+    expect(() => ScreenshotsManifestSchema.parse(good)).not.toThrow();
+  });
+
+  it('restricts source_kind to known values', () => {
+    const bad = {
+      entries: [{
+        item_id: 'x', path: 'p.png', fallback: false, source_domain: 'd',
+        width: 1200, height: 2400, source_kind: 'unknown_kind',
+      }],
+    };
+    expect(() => ScreenshotsManifestSchema.parse(bad)).toThrow();
+  });
+});
