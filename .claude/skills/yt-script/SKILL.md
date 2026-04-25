@@ -108,6 +108,14 @@ Five scenes, in order: INTRO, STORY 1, STORY 2, STORY 3, OUTRO. Each scene has b
 
 See `pipeline/schemas/storyboard.js` for the exact Zod schema — it's the source of truth for field names and enums.
 
+### `source_chip` beats — use the primary source domain, not the news aggregator
+
+For each story's `source_chip` beat, `content` MUST equal the hostname of the pick's `primary_source_url` from `picks.json` (with leading `www.` stripped). It must NOT be the domain of the original news article that covered the story (e.g., techcrunch.com, arstechnica.com, theverge.com) unless that IS the primary source.
+
+Compute it as: `new URL(pick.primary_source_url).hostname.replace(/^www\./, '')`.
+
+Example: pick 1 has `primary_source_url: "https://openai.com/index/introducing-gpt-5-5/"`. The source_chip content must be `"openai.com"`, NOT `"techcrunch.com"` (TechCrunch may have been one of the news articles that surfaced the story, but OpenAI's blog is the primary source).
+
 ## Output 4: `<run-dir>/storyboard.md`
 
 Human-readable sibling of the JSON, for the script-approval gate. Same scenes, same beats, prose-friendly:
