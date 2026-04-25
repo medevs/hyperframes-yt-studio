@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { analyzeScreenshot, isAcceptable } from './lib/screenshot-quality.mjs';
+import { checkMotionBudget } from './lib/motion-budget.mjs';
 
 const [, , workDir] = process.argv;
 if (!workDir) { console.error('usage: node lint.mjs <work-dir>'); process.exit(2); }
@@ -16,11 +17,11 @@ const validate = spawnSync('npx', ['hyperframes', 'validate'], {
 });
 if (validate.status !== 0) { console.error('hyperframes validate failed'); process.exit(1); }
 
-// Screenshot quality post-check
+let bad = 0;
+
 const manifestPath = join(workDir, 'screenshots-manifest.json');
 if (existsSync(manifestPath)) {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  let bad = 0;
   for (const e of manifest.entries) {
     if (!e.path) continue;
     const buf = readFileSync(join(workDir, e.path));
@@ -30,10 +31,24 @@ if (existsSync(manifestPath)) {
       bad++;
     }
   }
-  if (bad > 0) {
-    console.error(`${bad} screenshot(s) failed quality check — fix capture-screenshots or add per-domain override`);
-    process.exit(1);
+}
+
+const indexPath = join(workDir, 'index.html');
+if (existsSync(indexPath)) {
+  const html = readFileSync(indexPath, 'utf8');
+  const mb = checkMotionBudget(html);
+  for (const e of mb.errors) {
+    console.error(`motion_budget: ${e}`);
+    bad++;
+  }
+  for (const w of mb.warnings) {
+    console.warn(`motion_budget [warn]: ${w}`);
   }
 }
 
-console.log('OK lint + validate + screenshot_quality clean');
+if (bad > 0) {
+  console.error(`${bad} lint error(s) — fix before render`);
+  process.exit(1);
+}
+
+console.log('OK lint + validate + screenshot_quality + motion_budget clean');
