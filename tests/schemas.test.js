@@ -90,3 +90,26 @@ describe('PickSchema primary_source_url', () => {
     expect(ok.primary_source_url).toBe('https://openai.com/blog/x');
   });
 });
+
+describe('ConfigSchema screenshot_overrides', () => {
+  const baseRaw = JSON.parse(readFileSync('config.json', 'utf8'));
+
+  it('accepts an empty overrides map', () => {
+    expect(() => ConfigSchema.parse({ ...baseRaw, screenshot_overrides: {} })).not.toThrow();
+  });
+
+  it('accepts a populated overrides entry', () => {
+    const cfg = {
+      ...baseRaw,
+      screenshot_overrides: {
+        'openai.com': { hide: ['.cookie-banner'], wait_for: '.article', timeout_ms: 30000 },
+      },
+    };
+    expect(() => ConfigSchema.parse(cfg)).not.toThrow();
+  });
+
+  it('rejects a non-array hide field', () => {
+    const cfg = { ...baseRaw, screenshot_overrides: { 'openai.com': { hide: '.x' } } };
+    expect(() => ConfigSchema.parse(cfg)).toThrow();
+  });
+});
