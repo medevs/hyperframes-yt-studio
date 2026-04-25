@@ -82,6 +82,14 @@ const rssResults = await Promise.all([
 ]);
 const hn = await fetchHackerNews(config.sources.hackernews);
 const raw = [...rssResults.flat(), ...hn];
+
+if (raw.length === 0) {
+  mkdirSync(workDir, { recursive: true });
+  writeFileSync(join(workDir, 'fetch-errors.json'), JSON.stringify(fetchErrors, null, 2));
+  console.error(`ERROR: every source returned zero items (${fetchErrors.length} fetch errors). See ${workDir}/fetch-errors.json`);
+  process.exit(1);
+}
+
 const deduped = dedupItems(raw);
 const capped = capItems(deduped, ITEM_CAP);
 

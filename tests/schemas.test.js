@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 import { ItemsFileSchema } from '../pipeline/schemas/items.js';
 import { PickSchema, PicksFileSchema } from '../pipeline/schemas/picks.js';
 import { ClaimsFileSchema } from '../pipeline/schemas/claims.js';
@@ -7,6 +9,8 @@ import { StoryboardFileSchema } from '../pipeline/schemas/storyboard.js';
 import { TimingsFileSchema } from '../pipeline/schemas/timings.js';
 import { ScreenshotsManifestSchema } from '../pipeline/schemas/screenshots-manifest.js';
 import { ConfigSchema } from '../pipeline/schemas/config.js';
+
+const CONFIG_PATH = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'config.json');
 
 describe('ItemsFileSchema', () => {
   it('accepts a valid items file', () => {
@@ -62,7 +66,7 @@ describe('ScreenshotsManifestSchema', () => {
 
 describe('ConfigSchema', () => {
   it('accepts the checked-in config.json', () => {
-    const raw = JSON.parse(readFileSync('config.json', 'utf8'));
+    const raw = JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
     expect(() => ConfigSchema.parse(raw)).not.toThrow();
   });
 });
@@ -92,7 +96,7 @@ describe('PickSchema primary_source_url', () => {
 });
 
 describe('ConfigSchema screenshot_overrides', () => {
-  const baseRaw = JSON.parse(readFileSync('config.json', 'utf8'));
+  const baseRaw = JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
 
   it('accepts an empty overrides map', () => {
     expect(() => ConfigSchema.parse({ ...baseRaw, screenshot_overrides: {} })).not.toThrow();
