@@ -9,6 +9,7 @@ snapshots/
 .env.local
 .last-run
 .hyperframes/
+.worktrees/
 
 # Local convenience symlinks into .agents/skills/ (not portable on Windows without core.symlinks).
 # The canonical skill content lives at .agents/skills/ and IS committed.
