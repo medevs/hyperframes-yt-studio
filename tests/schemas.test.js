@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { ItemsFileSchema } from '../pipeline/schemas/items.js';
-import { PicksFileSchema } from '../pipeline/schemas/picks.js';
+import { PickSchema, PicksFileSchema } from '../pipeline/schemas/picks.js';
 import { ClaimsFileSchema } from '../pipeline/schemas/claims.js';
 import { StoryboardFileSchema } from '../pipeline/schemas/storyboard.js';
 import { TimingsFileSchema } from '../pipeline/schemas/timings.js';
@@ -64,5 +64,79 @@ describe('ConfigSchema', () => {
   it('accepts the checked-in config.json', () => {
     const raw = JSON.parse(readFileSync('config.json', 'utf8'));
     expect(() => ConfigSchema.parse(raw)).not.toThrow();
+  });
+});
+
+describe('PickSchema primary_source_url', () => {
+  const base = {
+    rank: 1,
+    item_id: 'rss-x',
+    angle: 'a',
+    rationale: 'r',
+    suggested_visuals: [],
+    risk_flags: [],
+  };
+
+  it('requires primary_source_url', () => {
+    expect(() => PickSchema.parse(base)).toThrow();
+  });
+
+  it('rejects non-URL primary_source_url', () => {
+    expect(() => PickSchema.parse({ ...base, primary_source_url: 'not-a-url' })).toThrow();
+  });
+
+  it('accepts a valid primary_source_url', () => {
+    const ok = PickSchema.parse({ ...base, primary_source_url: 'https://openai.com/blog/x' });
+    expect(ok.primary_source_url).toBe('https://openai.com/blog/x');
+  });
+});
+
+describe('ConfigSchema screenshot_overrides', () => {
+  const baseRaw = JSON.parse(readFileSync('config.json', 'utf8'));
+
+  it('accepts an empty overrides map', () => {
+    expect(() => ConfigSchema.parse({ ...baseRaw, screenshot_overrides: {} })).not.toThrow();
+  });
+
+  it('accepts a populated overrides entry', () => {
+    const cfg = {
+      ...baseRaw,
+      screenshot_overrides: {
+        'openai.com': { hide: ['.cookie-banner'], wait_for: '.article', timeout_ms: 30000 },
+      },
+    };
+    expect(() => ConfigSchema.parse(cfg)).not.toThrow();
+  });
+
+  it('rejects a non-array hide field', () => {
+    const cfg = { ...baseRaw, screenshot_overrides: { 'openai.com': { hide: '.x' } } };
+    expect(() => ConfigSchema.parse(cfg)).toThrow();
+  });
+});
+
+describe('ScreenshotsManifestSchema width/height/source_kind', () => {
+  it('requires width, height, source_kind on each entry', () => {
+    const bad = { entries: [{ item_id: 'x', path: 'p.png', fallback: false, source_domain: 'd' }] };
+    expect(() => ScreenshotsManifestSchema.parse(bad)).toThrow();
+  });
+
+  it('accepts a valid entry', () => {
+    const good = {
+      entries: [{
+        item_id: 'x', path: 'p.png', fallback: false, source_domain: 'd',
+        width: 1200, height: 2400, source_kind: 'primary',
+      }],
+    };
+    expect(() => ScreenshotsManifestSchema.parse(good)).not.toThrow();
+  });
+
+  it('restricts source_kind to known values', () => {
+    const bad = {
+      entries: [{
+        item_id: 'x', path: 'p.png', fallback: false, source_domain: 'd',
+        width: 1200, height: 2400, source_kind: 'unknown_kind',
+      }],
+    };
+    expect(() => ScreenshotsManifestSchema.parse(bad)).toThrow();
   });
 });
