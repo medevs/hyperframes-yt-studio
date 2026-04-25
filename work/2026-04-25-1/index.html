@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Daily — 2026-04-25</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/motion-primitives.css">
+<style>
+  :root {
+    --bg-primary: #0A0A0A;
+    --bg-secondary: #1A1A1A;
+    --fg-primary: #F5F5F5;
+    --fg-secondary: #A0A0A0;
+    --accent: #0066FF;
+    --divider: #2A2A2A;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    width: 1920px; height: 1080px;
+    background: var(--bg-primary);
+    color: var(--fg-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ============================================================
+     SCENE — full canvas; beats stack inside via z-layers and
+     opacity, only one is "lit" at a time.
+     ============================================================ */
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 1920px; height: 1080px;
+    background: var(--bg-primary);
+    overflow: hidden;
+  }
+
+  /* Each beat is an absolutely-positioned full-bleed cell. Beats
+     are stacked; GSAP fades them in/out one at a time. */
+  .beat {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    display: grid;
+    box-sizing: border-box;
+    opacity: 0; /* GSAP tweens to 1 when active */
+  }
+
+  /* Decorative grid behind everything */
+  .grid-decorative .grid-h, .grid-decorative .grid-v { background: var(--divider); }
+
+  /* Source chip — only allowed absolute-positioned text element */
+  .source-chip {
+    position: absolute;
+    right: 80px; bottom: 60px;
+    font-size: 22px; font-weight: 600; letter-spacing: 1px;
+    color: var(--fg-secondary); text-transform: lowercase;
+    padding: 10px 18px;
+    border: 1px solid var(--divider);
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+  }
+
+  /* ============================================================
+     INTRO
+     ============================================================ */
+  #intro .beat-hero {
+    grid-template-rows: 1fr auto auto auto 1fr;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+    padding: 0 120px;
+    text-align: center;
+  }
+  #intro .beat-hero .date-label {
+    grid-row: 2;
+    font-size: 32px; font-weight: 500; letter-spacing: 4px;
+    color: var(--fg-secondary); text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  #intro .beat-hero .hero-title {
+    grid-row: 3;
+    font-size: 280px; font-weight: 800; letter-spacing: -8px;
+    line-height: 0.9; color: var(--fg-primary);
+  }
+  #intro .beat-hero .hero-title .ai { color: var(--accent); }
+  #intro .beat-hero .accent-rule {
+    grid-row: 4;
+    margin-top: 36px;
+    width: 320px; height: 8px;
+    background: var(--accent);
+    transform-origin: center;
+  }
+
+  /* Story teasers (intro B2/B3/B4) — full-bleed two-cell layout */
+  .teaser {
+    grid-template-columns: 520px 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding: 0 120px;
+  }
+  .teaser .teaser-num {
+    grid-column: 1; grid-row: 1;
+    font-size: 360px; font-weight: 800; letter-spacing: -10px;
+    line-height: 0.85;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    text-align: left;
+    align-self: center;
+  }
+  .teaser .teaser-text {
+    grid-column: 2; grid-row: 1;
+    font-size: 84px; font-weight: 800; letter-spacing: -2px;
+    line-height: 1.05; color: var(--fg-primary);
+    align-self: center;
+    padding-left: 40px;
+  }
+  .teaser .teaser-meta {
+    position: absolute;
+    top: 80px; left: 120px;
+    font-size: 24px; font-weight: 500; letter-spacing: 2px;
+    color: var(--fg-secondary); text-transform: uppercase;
+  }
+
+  /* ============================================================
+     STORY scenes — shared beat layouts
+     ============================================================ */
+
+  /* Cold-open beat: giant story number on left, headline sliding in from right */
+  .beat-cold-open {
+    grid-template-columns: 720px 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding: 0 120px;
+    gap: 60px;
+  }
+  .beat-cold-open .story-num-big {
+    grid-column: 1; grid-row: 1;
+    font-size: 480px; font-weight: 800; letter-spacing: -16px;
+    line-height: 0.85;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    align-self: center;
+  }
+  .beat-cold-open .story-headline {
+    grid-column: 2; grid-row: 1;
+    font-size: 96px; font-weight: 800; letter-spacing: -2px;
+    line-height: 1.05; color: var(--fg-primary);
+    align-self: center;
+  }
+
+  /* Headline-hold beat: centered hero text, optional ghost screenshot bg */
+  .beat-headline-hold {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    place-items: center;
+    padding: 0 120px;
+    text-align: center;
+  }
+  .beat-headline-hold .ghost-img {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.20;
+    filter: grayscale(40%) brightness(0.6);
+    z-index: 0;
+  }
+  .beat-headline-hold .ghost-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.85) 100%);
+    z-index: 1;
+  }
+  .beat-headline-hold .label-above {
+    position: relative; z-index: 2;
+    font-size: 28px; font-weight: 500; letter-spacing: 4px;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .beat-headline-hold .hero-headline {
+    position: relative; z-index: 2;
+    font-size: 144px; font-weight: 800; letter-spacing: -3px;
+    line-height: 1.0; color: var(--fg-primary);
+    max-width: 1500px;
+  }
+
+  /* Stat beat: label above + giant number filling canvas */
+  .beat-stat {
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-columns: 1fr;
+    place-items: center;
+    text-align: center;
+    padding: 0 120px;
+  }
+  .beat-stat .stat-label {
+    grid-row: 2;
+    font-size: 32px; font-weight: 500; letter-spacing: 4px;
+    color: var(--fg-secondary); text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .beat-stat .stat-value {
+    grid-row: 3;
+    font-size: 320px; font-weight: 800; letter-spacing: -10px;
+    line-height: 0.85;
+    color: var(--fg-primary);
+    font-variant-numeric: tabular-nums;
+    display: flex; align-items: baseline; justify-content: center; gap: 12px;
+  }
+  .beat-stat .stat-value .prefix,
+  .beat-stat .stat-value .suffix {
+    font-size: 200px; font-weight: 800; color: var(--accent);
+    letter-spacing: -6px;
+  }
+  .beat-stat .stat-sub {
+    grid-row: 4;
+    margin-top: 32px;
+    font-size: 28px; font-weight: 500; letter-spacing: 2px;
+    color: var(--fg-secondary); text-transform: uppercase;
+  }
+
+  /* Quote beat: hero-sized quote with kinetic word */
+  .beat-quote {
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-columns: 1fr;
+    place-items: center;
+    text-align: center;
+    padding: 0 120px;
+  }
+  .beat-quote .quote-mark {
+    grid-row: 2;
+    font-size: 200px; font-weight: 800; line-height: 0.6;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .beat-quote .quote-text {
+    grid-row: 3;
+    font-size: 132px; font-weight: 800; letter-spacing: -3px;
+    line-height: 1.05; color: var(--fg-primary);
+    max-width: 1600px;
+  }
+  .beat-quote .quote-attr {
+    grid-row: 4;
+    margin-top: 48px;
+    font-size: 32px; font-weight: 500; letter-spacing: 4px;
+    color: var(--fg-secondary); text-transform: uppercase;
+  }
+
+  /* Visual beat: full-bleed screenshot with ken-burns + caption strip */
+  .beat-visual {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+  .beat-visual .kb-img {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    will-change: transform;
+  }
+  .beat-visual .kb-vignette {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,10,0.30) 0%, rgba(10,10,10,0.20) 50%, rgba(10,10,10,0.92) 100%);
+    z-index: 1;
+  }
+  .beat-visual .kb-caption {
+    position: absolute;
+    left: 120px; right: 120px; bottom: 100px;
+    z-index: 2;
+    font-size: 64px; font-weight: 800; letter-spacing: -1px;
+    line-height: 1.1;
+    color: var(--fg-primary);
+    text-align: center;
+  }
+  .beat-visual .kb-caption .kw {
+    color: var(--accent);
+  }
+
+  /* Stat-bar visual beat (story-3 B4) */
+  .beat-statbar {
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-columns: 1fr;
+    place-items: center;
+    padding: 0 120px;
+    text-align: center;
+  }
+  .beat-statbar .sb-label {
+    grid-row: 2;
+    font-size: 32px; font-weight: 500; letter-spacing: 4px;
+    color: var(--fg-secondary); text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+  .beat-statbar .sb-row {
+    grid-row: 3;
+    width: 1400px;
+  }
+  .beat-statbar .sb-row .stat-bar {
+    width: 100%;
+  }
+  .beat-statbar .sb-row .stat-bar .bar-track {
+    height: 32px;
+  }
+  .beat-statbar .sb-row .stat-bar .bar-label {
+    font-size: 32px; min-width: 360px;
+  }
+  .beat-statbar .sb-row .stat-bar .bar-value {
+    font-size: 96px; min-width: 180px;
+  }
+  .beat-statbar .sb-cap {
+    grid-row: 4;
+    margin-top: 56px;
+    font-size: 36px; font-weight: 600; letter-spacing: 1px;
+    color: var(--fg-primary);
+  }
+
+  /* Takeaway beat: FOR BUILDERS label + giant takeaway */
+  .beat-takeaway {
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-columns: 1fr;
+    place-items: center;
+    text-align: center;
+    padding: 0 120px;
+  }
+  .beat-takeaway .tk-label {
+    grid-row: 2;
+    font-size: 28px; font-weight: 500; letter-spacing: 6px;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+  .beat-takeaway .tk-text {
+    grid-row: 3;
+    font-size: 132px; font-weight: 800; letter-spacing: -3px;
+    line-height: 1.0; color: var(--fg-primary);
+    max-width: 1600px;
+  }
+  .beat-takeaway .tk-rule {
+    grid-row: 4;
+    margin-top: 48px;
+    width: 240px; height: 6px;
+    background: var(--accent);
+  }
+
+  /* ============================================================
+     OUTRO
+     ============================================================ */
+  #outro .beat-outro-hero {
+    grid-template-rows: 1fr auto auto auto 1fr;
+    grid-template-columns: 1fr;
+    place-items: center;
+    text-align: center;
+  }
+  #outro .beat-outro-hero .hero-title {
+    grid-row: 2;
+    font-size: 280px; font-weight: 800; letter-spacing: -8px;
+    line-height: 0.9; color: var(--fg-primary);
+  }
+  #outro .beat-outro-hero .hero-title .ai { color: var(--accent); }
+  #outro .beat-outro-hero .out-rule {
+    grid-row: 3;
+    margin-top: 36px;
+    width: 320px; height: 8px;
+    background: var(--accent);
+    transform-origin: center;
+  }
+  #outro .beat-outro-hero .out-fb {
+    grid-row: 4;
+    margin-top: 32px;
+    font-size: 36px; font-weight: 500; letter-spacing: 6px;
+    color: var(--fg-secondary); text-transform: uppercase;
+  }
+
+  #outro .beat-outro-cta {
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-columns: 1fr;
+    place-items: center;
+    text-align: center;
+    padding: 0 120px;
+  }
+  #outro .beat-outro-cta .cta-fb {
+    grid-row: 2;
+    font-size: 96px; font-weight: 800; letter-spacing: -2px;
+    color: var(--fg-primary);
+    margin-bottom: 36px;
+  }
+  #outro .beat-outro-cta .cta-text {
+    grid-row: 3;
+    font-size: 56px; font-weight: 600; letter-spacing: 1px;
+    color: var(--accent);
+  }
+
+  /* CountUp inherits stat-value styling */
+  .count-up { display: inline-block; }
+</style>
+<script src="assets/gsap.min.js"></script>
+<script>
+// HF 0.4.26 studio fix: signal "runtime present" so <hyperframes-player>
+// doesn't try to inject the CDN runtime (which can fail/stall on the user's
+// network and leaves the play button disabled). We register __timelines
+// ourselves below; the player only needs to know not to fetch the CDN.
+window.__hf = window.__hf || { selfHosted: true };
+</script>
+<script>
+(function() {
+  // ---- IIFE: motion-primitives runtime (mirrors assets/motion-primitives.js) ----
+  function formatBigNumber(n) {
+    const abs = Math.abs(n);
+    if (abs >= 1e12) return (n / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
+    if (abs >= 1e9)  return (n / 1e9).toFixed(1).replace(/\.0$/, '')  + 'B';
+    if (abs >= 1e6)  return (n / 1e6).toFixed(1).replace(/\.0$/, '')  + 'M';
+    if (abs >= 1e3)  return (n / 1e3).toFixed(1).replace(/\.0$/, '')  + 'K';
+    if (Number.isInteger(n)) return String(n);
+    return n.toFixed(2).replace(/\.?0+$/, '');
+  }
+  window.formatBigNumber = formatBigNumber;
+
+  window.registerKineticTweens = function(tl, root) {
+    root = root || document;
+    const kws = root.querySelectorAll('.kw[data-emphasize-at]');
+    kws.forEach(function(el) {
+      const at = parseFloat(el.dataset.emphasizeAt);
+      tl.from(el, { y: '0.4em', opacity: 0, scale: 0.92, duration: 0.18, ease: 'back.out(1.7)' }, at);
+      tl.to(el, { backgroundSize: '100% 4px', duration: 0.4, ease: 'power3.out' }, at + 0.05);
+    });
+  };
+
+  window.registerCountUps = function(tl, root) {
+    root = root || document;
+    const els = root.querySelectorAll('.count-up[data-target]');
+    els.forEach(function(el) {
+      const target = parseFloat(el.dataset.target);
+      const at = parseFloat(el.dataset.at);
+      const dur = parseFloat(el.dataset.duration || '1.0');
+      const proxy = { v: 0 };
+      tl.to(proxy, {
+        v: target,
+        duration: dur,
+        ease: 'expo.out',
+        onUpdate: function() { el.textContent = window.formatBigNumber(proxy.v); },
+      }, at);
+    });
+  };
+
+  window.registerScrollFrames = function(tl, root) {
+    root = root || document;
+    const frames = root.querySelectorAll('.scroll-frame[data-distance]');
+    frames.forEach(function(frame) {
+      const img = frame.querySelector('img');
+      if (!img) return;
+      const at = parseFloat(frame.dataset.at);
+      const dur = parseFloat(frame.dataset.duration);
+      const dist = parseFloat(frame.dataset.distance);
+      tl.fromTo(img, { y: 0 }, { y: -Math.abs(dist), duration: dur, ease: 'none' }, at);
+    });
+  };
+
+  window.registerStatBars = function(tl, root) {
+    root = root || document;
+    const bars = root.querySelectorAll('.stat-bar[data-target-pct]');
+    bars.forEach(function(bar) {
+      const fill = bar.querySelector('.bar-fill');
+      const at = parseFloat(bar.dataset.at);
+      const pct = parseFloat(bar.dataset.targetPct);
+      tl.fromTo(fill, { width: '0%' }, { width: pct + '%', duration: 0.6, ease: 'power3.out' }, at);
+    });
+  };
+
+  window.registerCaptions = function(tl, root) {
+    root = root || document;
+    const caps = root.querySelectorAll('.caption-line[data-at]');
+    caps.forEach(function(cap) {
+      const at = parseFloat(cap.dataset.at);
+      const end = parseFloat(cap.dataset.end);
+      tl.fromTo(cap, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, ease: 'power3.out' }, at);
+      tl.to(cap, { opacity: 0, duration: 0.15, ease: 'power2.in' }, end - 0.15);
+      tl.set(cap, { opacity: 0 }, end);
+    });
+  };
+})();
+</script>
+</head>
+<body>
+<div id="ai-daily" data-composition-id="ai-daily" data-width="1920" data-height="1080" data-start="0" data-duration="186.12">
+
+<!-- Audio: track 0 — per HF docs, audio MUST NOT have class="clip" -->
+<audio id="narration" data-start="0" data-duration="186.12" data-track-index="0" src="narration.wav" preload="auto"></audio>
+
+<!-- =================================================================
+     INTRO scene: 0 → 14.67  (audio scene 0.03 → 12.87, gap 1.80s)
+     4 beats: hero → teaser-1 → teaser-2 → teaser-3
+     ================================================================= -->
+<div id="intro" class="scene clip" data-start="0" data-duration="14.67" data-track-index="1">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:540px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:960px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <!-- B1: Hero "AI DAILY" 0–2.6s -->
+  <div id="intro-b1" class="beat beat-hero clip" data-start="0" data-duration="2.6" data-track-index="2">
+    <div class="date-label">April 25 · 2026</div>
+    <div class="hero-title"><span class="ai">AI</span> DAILY</div>
+    <div class="accent-rule"></div>
+  </div>
+
+  <!-- B2: Story 01 teaser 2.6–6.0s -->
+  <div id="intro-b2" class="beat teaser clip" data-start="2.6" data-duration="3.4" data-track-index="2">
+    <div class="teaser-meta">Today · 01</div>
+    <div class="teaser-num">01</div>
+    <div class="teaser-text">DeepSeek V4 — largest open-weight model</div>
+  </div>
+
+  <!-- B3: Story 02 teaser 6.0–9.5s -->
+  <div id="intro-b3" class="beat teaser clip" data-start="6.0" data-duration="3.5" data-track-index="2">
+    <div class="teaser-meta">Today · 02</div>
+    <div class="teaser-num">02</div>
+    <div class="teaser-text">OpenAI ships GPT-5.5</div>
+  </div>
+
+  <!-- B4: Story 03 teaser 9.5–14.67s -->
+  <div id="intro-b4" class="beat teaser clip" data-start="9.5" data-duration="5.17" data-track-index="2">
+    <div class="teaser-meta">Today · 03</div>
+    <div class="teaser-num">03</div>
+    <div class="teaser-text">Mythos: as capable as top human security researchers</div>
+  </div>
+</div>
+
+<!-- =================================================================
+     STORY 1: 14.67 → 71.24 (duration 56.57)
+     Audio scene 14.67 → 66.52
+     7 beats: cold-open → headline-hold → stat1 → stat2 → stat3
+              → visual+kinetic → takeaway
+     ================================================================= -->
+<div id="story-1" class="scene clip" data-start="14.67" data-duration="56.57" data-track-index="1">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <!-- B1: Cold open 14.67–17.67 (rel 0–3) -->
+  <div id="s1-b1" class="beat beat-cold-open clip" data-start="14.67" data-duration="3.0" data-track-index="2">
+    <div class="story-num-big">01</div>
+    <div class="story-headline">DeepSeek V4 Preview</div>
+  </div>
+
+  <!-- B2: Headline hold 17.67–24.67 (rel 3–10) -->
+  <div id="s1-b2" class="beat beat-headline-hold clip" data-start="17.67" data-duration="7.0" data-track-index="2">
+    <img class="ghost-img" src="screenshots/rss-180cc5597a27c60a.png" alt="">
+    <div class="ghost-overlay"></div>
+    <div class="label-above">Story 01 · Techcrunch</div>
+    <div class="hero-headline">DeepSeek V4 Preview</div>
+  </div>
+
+  <!-- B3: Stat 1 — 1.6T parameters 24.67–31.67 (rel 10–17) -->
+  <div id="s1-b3" class="beat beat-stat clip" data-start="24.67" data-duration="7.0" data-track-index="2">
+    <div class="stat-label">Pro · Total Parameters</div>
+    <div class="stat-value">
+      <span class="count-up" data-target="1600000000000" data-at="25.10" data-duration="1.0">0</span>
+    </div>
+    <div class="stat-sub">largest open-weight model available</div>
+  </div>
+
+  <!-- B4: Stat 2 — 1M context 31.67–38.67 (rel 17–24) -->
+  <div id="s1-b4" class="beat beat-stat clip" data-start="31.67" data-duration="7.0" data-track-index="2">
+    <div class="stat-label">Context Window · Tokens</div>
+    <div class="stat-value">
+      <span class="count-up" data-target="1000000" data-at="32.10" data-duration="1.0">0</span>
+    </div>
+    <div class="stat-sub">v4 flash and v4 pro</div>
+  </div>
+
+  <!-- B5: Stat 3 — $0.145 input price 38.67–45.67 (rel 24–31) -->
+  <div id="s1-b5" class="beat beat-stat clip" data-start="38.67" data-duration="7.0" data-track-index="2">
+    <div class="stat-label">V4 Pro · Input Price · per 1M tokens</div>
+    <div class="stat-value">
+      <span class="prefix">$</span><span class="count-up" data-target="0.145" data-at="39.10" data-duration="1.0">0</span>
+    </div>
+    <div class="stat-sub">cheapest in its class</div>
+  </div>
+
+  <!-- B6: Visual + kinetic caption 45.67–57.67 (rel 31–43) -->
+  <div id="s1-b6" class="beat beat-visual clip" data-start="45.67" data-duration="12.0" data-track-index="2">
+    <img id="s1-kb" class="kb-img" src="screenshots/rss-180cc5597a27c60a.png" alt="DeepSeek V4 article">
+    <div class="kb-vignette"></div>
+    <div class="kb-caption">
+      <span class="kw" data-emphasize-at="57.24">UNDERCUTS</span> Gemini 3.1 Pro · GPT-5.5 · Claude Opus 4.7 · GPT-5.4
+    </div>
+  </div>
+
+  <!-- B7: Takeaway 57.67–71.24 (rel 43–56.57) -->
+  <div id="s1-b7" class="beat beat-takeaway clip" data-start="57.67" data-duration="13.569" data-track-index="2">
+    <div class="tk-label">For Builders</div>
+    <div class="tk-text">Build-versus-buy math just shifted.</div>
+    <div class="tk-rule"></div>
+  </div>
+
+  <div class="source-chip" id="s1-source">techcrunch.com</div>
+</div>
+
+<!-- =================================================================
+     STORY 2: 71.24 → 125.55 (duration 54.31)
+     Audio scene 71.24 → 122.42
+     6 beats: cold-open → headline-hold → quote → caption+visual
+              → stat → takeaway
+     ================================================================= -->
+<div id="story-2" class="scene clip" data-start="71.24" data-duration="54.31" data-track-index="1">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <!-- B1: Cold open 71.24–74.24 (rel 0–3) -->
+  <div id="s2-b1" class="beat beat-cold-open clip" data-start="71.24" data-duration="3.0" data-track-index="2">
+    <div class="story-num-big">02</div>
+    <div class="story-headline">OpenAI ships GPT-5.5</div>
+  </div>
+
+  <!-- B2: Headline hold 74.24–81.24 (rel 3–10) -->
+  <div id="s2-b2" class="beat beat-headline-hold clip" data-start="74.24" data-duration="7.0" data-track-index="2">
+    <img class="ghost-img" src="screenshots/rss-6ce98c6b2e29209e.png" alt="">
+    <div class="ghost-overlay"></div>
+    <div class="label-above">Story 02 · Techcrunch</div>
+    <div class="hero-headline">OpenAI ships GPT-5.5</div>
+  </div>
+
+  <!-- B3: Quote 81.24–93.24 (rel 10–22) -->
+  <div id="s2-b3" class="beat beat-quote clip" data-start="81.24" data-duration="12.0" data-track-index="2">
+    <div class="quote-mark">&ldquo;</div>
+    <div class="quote-text">
+      <span class="kw" data-emphasize-at="80.60">Agentic</span> and intuitive computing.
+    </div>
+    <div class="quote-attr">— Greg Brockman, OpenAI</div>
+  </div>
+
+  <!-- B4: Caption + visual 93.24–105.24 (rel 22–34) -->
+  <div id="s2-b4" class="beat beat-visual clip" data-start="93.24" data-duration="12.0" data-track-index="2">
+    <img id="s2-kb" class="kb-img" src="screenshots/rss-6ce98c6b2e29209e.png" alt="OpenAI GPT-5.5 article">
+    <div class="kb-vignette"></div>
+    <div class="kb-caption">
+      Super App — ChatGPT · Codex · AI Browser
+    </div>
+  </div>
+
+  <!-- B5: Stat — 1 month cadence 105.24–114.24 (rel 34–43) -->
+  <div id="s2-b5" class="beat beat-stat clip" data-start="105.24" data-duration="9.0" data-track-index="2">
+    <div class="stat-label">Last Release Cadence</div>
+    <div class="stat-value">
+      <span class="count-up" data-target="1" data-at="105.74" data-duration="0.7">0</span><span class="suffix">MO</span>
+    </div>
+    <div class="stat-sub">December → April → next?</div>
+  </div>
+
+  <!-- B6: Takeaway 114.24–125.55 (rel 43–54.31) -->
+  <div id="s2-b6" class="beat beat-takeaway clip" data-start="114.24" data-duration="11.31" data-track-index="2">
+    <div class="tk-label">For Builders</div>
+    <div class="tk-text">Plan for a moving target.</div>
+    <div class="tk-rule"></div>
+  </div>
+
+  <div class="source-chip" id="s2-source">techcrunch.com</div>
+</div>
+
+<!-- =================================================================
+     STORY 3: 125.55 → 176.30 (duration 50.75)
+     Audio scene 125.55 → 174.43
+     6 beats: cold-open → headline-hold → quote → stat-bar
+              → caption+visual → takeaway
+     ================================================================= -->
+<div id="story-3" class="scene clip" data-start="125.55" data-duration="50.75" data-track-index="1">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <!-- B1: Cold open 125.55–128.55 (rel 0–3) -->
+  <div id="s3-b1" class="beat beat-cold-open clip" data-start="125.55" data-duration="3.0" data-track-index="2">
+    <div class="story-num-big">03</div>
+    <div class="story-headline">Mythos × Firefox</div>
+  </div>
+
+  <!-- B2: Headline hold 128.55–135.55 (rel 3–10) -->
+  <div id="s3-b2" class="beat beat-headline-hold clip" data-start="128.55" data-duration="7.0" data-track-index="2">
+    <img class="ghost-img" src="screenshots/rss-036a76cbfdc2cef6.png" alt="">
+    <div class="ghost-overlay"></div>
+    <div class="label-above">Story 03 · Ars Technica</div>
+    <div class="hero-headline">Mythos × Firefox</div>
+  </div>
+
+  <!-- B3: Quote 135.55–147.55 (rel 10–22) -->
+  <div id="s3-b3" class="beat beat-quote clip" data-start="135.55" data-duration="12.0" data-track-index="2">
+    <div class="quote-mark">&ldquo;</div>
+    <div class="quote-text">
+      Every bit as <span class="kw" data-emphasize-at="128.74">CAPABLE</span>.
+    </div>
+    <div class="quote-attr">— Mozilla, on Anthropic's Mythos</div>
+  </div>
+
+  <!-- B4: Stat-bar 147.55–159.55 (rel 22–34) -->
+  <div id="s3-b4" class="beat beat-statbar clip" data-start="147.55" data-duration="12.0" data-track-index="2">
+    <div class="sb-label">Codebase Coverage</div>
+    <div class="sb-row">
+      <div class="stat-bar" data-target-pct="100" data-at="148.05">
+        <div class="bar-label">Audit Reach</div>
+        <div class="bar-track"><div class="bar-fill"></div></div>
+        <div class="bar-value">∞</div>
+      </div>
+    </div>
+    <div class="sb-cap">Every codebase now in range</div>
+  </div>
+
+  <!-- B5: Caption + visual 159.55–167.55 (rel 34–42) -->
+  <div id="s3-b5" class="beat beat-visual clip" data-start="159.55" data-duration="8.0" data-track-index="2">
+    <img id="s3-kb" class="kb-img" src="screenshots/rss-036a76cbfdc2cef6.png" alt="Mozilla Mythos article">
+    <div class="kb-vignette"></div>
+    <div class="kb-caption">
+      Every codebase now in range
+    </div>
+  </div>
+
+  <!-- B6: Takeaway 167.55–176.30 (rel 42–50.75) -->
+  <div id="s3-b6" class="beat beat-takeaway clip" data-start="167.55" data-duration="8.75" data-track-index="2">
+    <div class="tk-label">For Builders</div>
+    <div class="tk-text">Assume an AI auditor is already running.</div>
+    <div class="tk-rule"></div>
+  </div>
+
+  <div class="source-chip" id="s3-source">arstechnica.com</div>
+</div>
+
+<!-- =================================================================
+     OUTRO: 176.30 → 186.12 (duration 9.82)
+     3 beats: hero → CTA enlarge → CTA pulse
+     ================================================================= -->
+<div id="outro" class="scene clip" data-start="176.30" data-duration="9.82" data-track-index="1">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <!-- B1: Hero 176.30–179.80 (rel 0–3.5) -->
+  <div id="outro-b1" class="beat beat-outro-hero clip" data-start="176.30" data-duration="3.5" data-track-index="2">
+    <div class="hero-title"><span class="ai">AI</span> DAILY</div>
+    <div class="out-rule"></div>
+    <div class="out-fb">For Builders</div>
+  </div>
+
+  <!-- B2: CTA enlarge 179.80–183.30 (rel 3.5–7.0) -->
+  <div id="outro-b2" class="beat beat-outro-cta clip" data-start="179.80" data-duration="3.5" data-track-index="2">
+    <div class="cta-fb">For Builders</div>
+    <div class="cta-text">Subscribe for daily AI news</div>
+  </div>
+
+  <!-- B3: CTA pulse 183.30–186.12 (rel 7.0–9.82) -->
+  <div id="outro-b3" class="beat beat-outro-cta clip" data-start="183.30" data-duration="2.82" data-track-index="2">
+    <div class="cta-fb">Subscribe</div>
+    <div class="cta-text">For daily AI news, built for builders</div>
+  </div>
+</div>
+
+<script>
+  // ---- Master GSAP timeline ----
+  const tl = gsap.timeline({ paused: true });
+
+  // ============================================================
+  // Beat helper — fade element in (with subtle transform), then
+  // fade out at the end of its time slice. Uses absolute time.
+  // ============================================================
+  function beatIn(selector, atSec, opts) {
+    opts = opts || {};
+    tl.fromTo(selector,
+      { opacity: 0, scale: opts.fromScale || 0.96, y: opts.fromY != null ? opts.fromY : 24 },
+      { opacity: 1, scale: 1, y: 0, duration: opts.duration || 0.45, ease: opts.ease || 'expo.out' },
+      atSec);
+  }
+  function beatOut(selector, atSec, opts) {
+    opts = opts || {};
+    tl.to(selector,
+      { opacity: 0, scale: opts.toScale || 1.04, duration: opts.duration || 0.35, ease: 'power2.in' },
+      atSec - (opts.duration || 0.35));
+  }
+
+  // ============================================================
+  // INTRO (0 → 14.67)
+  // ============================================================
+  // Decorative grid entrance
+  tl.from('#intro .grid-h, #intro .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.6, ease: 'expo.out', stagger: 0.04 }, 0.1);
+
+  // B1: Hero "AI DAILY" 0–2.6
+  beatIn('#intro-b1', 0.05, { duration: 0.55, ease: 'power4.out' });
+  tl.from('#intro-b1 .hero-title', { y: 60, opacity: 0, duration: 0.7, ease: 'power4.out' }, 0.15);
+  tl.from('#intro-b1 .accent-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 0.55);
+  tl.from('#intro-b1 .date-label', { y: 18, opacity: 0, duration: 0.4, ease: 'power3.out' }, 0.4);
+  beatOut('#intro-b1', 2.6, { duration: 0.35 });
+
+  // B2: Story 01 teaser 2.6–6.0
+  beatIn('#intro-b2', 2.55, { duration: 0.5, ease: 'power4.out' });
+  tl.from('#intro-b2 .teaser-num', { x: -80, opacity: 0, duration: 0.5, ease: 'expo.out' }, 2.55);
+  tl.from('#intro-b2 .teaser-text', { x: 60, opacity: 0, duration: 0.55, ease: 'power4.out' }, 2.7);
+  beatOut('#intro-b2', 6.0, { duration: 0.35 });
+
+  // B3: Story 02 teaser 6.0–9.5
+  beatIn('#intro-b3', 5.95, { duration: 0.5, ease: 'power4.out' });
+  tl.from('#intro-b3 .teaser-num', { x: -80, opacity: 0, duration: 0.5, ease: 'expo.out' }, 5.95);
+  tl.from('#intro-b3 .teaser-text', { x: 60, opacity: 0, duration: 0.55, ease: 'power4.out' }, 6.10);
+  beatOut('#intro-b3', 9.5, { duration: 0.35 });
+
+  // B4: Story 03 teaser 9.5–14.67
+  beatIn('#intro-b4', 9.45, { duration: 0.5, ease: 'power4.out' });
+  tl.from('#intro-b4 .teaser-num', { x: -80, opacity: 0, duration: 0.5, ease: 'expo.out' }, 9.45);
+  tl.from('#intro-b4 .teaser-text', { x: 60, opacity: 0, duration: 0.55, ease: 'power4.out' }, 9.60);
+  // No exit — last intro beat hands off to story-1 entrance
+
+  // ============================================================
+  // STORY 1 (14.67 → 71.24)
+  // ============================================================
+  tl.from('#story-1 .grid-h, #story-1 .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.5, ease: 'expo.out', stagger: 0.03 }, 14.70);
+
+  // B1: Cold open 14.67–17.67
+  beatIn('#s1-b1', 14.70, { duration: 0.5 });
+  tl.from('#s1-b1 .story-num-big', { x: -120, opacity: 0, duration: 0.65, ease: 'power4.out' }, 14.70);
+  tl.from('#s1-b1 .story-headline', { x: 80, opacity: 0, duration: 0.6, ease: 'power4.out' }, 14.95);
+  beatOut('#s1-b1', 17.67, { duration: 0.35 });
+
+  // B2: Headline hold 17.67–24.67
+  beatIn('#s1-b2', 17.62, { duration: 0.5 });
+  tl.from('#s1-b2 .hero-headline', { y: 30, opacity: 0, duration: 0.6, ease: 'power4.out' }, 17.75);
+  tl.from('#s1-b2 .label-above', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 17.65);
+  // Slow ghost-image drift across hold
+  tl.fromTo('#s1-b2 .ghost-img',
+    { scale: 1.05, x: -10 },
+    { scale: 1.10, x: 10, duration: 7.0, ease: 'none' }, 17.67);
+  beatOut('#s1-b2', 24.67, { duration: 0.35 });
+
+  // B3: Stat 1 — 1.6T
+  beatIn('#s1-b3', 24.62, { duration: 0.5 });
+  tl.from('#s1-b3 .stat-label', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 24.70);
+  tl.from('#s1-b3 .stat-value', { y: 40, opacity: 0, scale: 0.92, duration: 0.6, ease: 'back.out(1.4)' }, 24.95);
+  tl.from('#s1-b3 .stat-sub', { y: 12, opacity: 0, duration: 0.4, ease: 'power3.out' }, 26.10);
+  beatOut('#s1-b3', 31.67, { duration: 0.35 });
+
+  // B4: Stat 2 — 1M
+  beatIn('#s1-b4', 31.62, { duration: 0.5 });
+  tl.from('#s1-b4 .stat-label', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 31.70);
+  tl.from('#s1-b4 .stat-value', { y: 40, opacity: 0, scale: 0.92, duration: 0.6, ease: 'back.out(1.4)' }, 31.95);
+  tl.from('#s1-b4 .stat-sub', { y: 12, opacity: 0, duration: 0.4, ease: 'power3.out' }, 33.10);
+  beatOut('#s1-b4', 38.67, { duration: 0.35 });
+
+  // B5: Stat 3 — $0.145
+  beatIn('#s1-b5', 38.62, { duration: 0.5 });
+  tl.from('#s1-b5 .stat-label', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 38.70);
+  tl.from('#s1-b5 .stat-value', { y: 40, opacity: 0, scale: 0.92, duration: 0.6, ease: 'back.out(1.4)' }, 38.95);
+  tl.from('#s1-b5 .stat-sub', { y: 12, opacity: 0, duration: 0.4, ease: 'power3.out' }, 40.10);
+  beatOut('#s1-b5', 45.67, { duration: 0.35 });
+
+  // B6: Visual + kinetic 45.67–57.67  (ken-burns over 12s)
+  beatIn('#s1-b6', 45.62, { duration: 0.5 });
+  tl.fromTo('#s1-kb',
+    { scale: 1.05, x: -30, y: -15 },
+    { scale: 1.18, x: 30, y: 15, duration: 12.0, ease: 'none' }, 45.67);
+  tl.from('#s1-b6 .kb-caption', { y: 30, opacity: 0, duration: 0.55, ease: 'power4.out' }, 46.10);
+  beatOut('#s1-b6', 57.67, { duration: 0.4 });
+
+  // B7: Takeaway 57.67–71.24
+  beatIn('#s1-b7', 57.62, { duration: 0.55, ease: 'power4.out' });
+  tl.from('#s1-b7 .tk-label', { y: 16, opacity: 0, duration: 0.4, ease: 'expo.out' }, 57.65);
+  tl.from('#s1-b7 .tk-text', { y: 40, opacity: 0, duration: 0.7, ease: 'power4.out' }, 57.85);
+  tl.from('#s1-b7 .tk-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 58.55);
+  // No exit — hands off to story-2
+
+  // Source chip — appears at B2 onward, fades when scene ends
+  tl.fromTo('#s1-source', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 18.0);
+  tl.to('#s1-source', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 70.94);
+  tl.set('#s1-source', { opacity: 0 }, 71.24);
+
+  // ============================================================
+  // STORY 2 (71.24 → 125.55)
+  // ============================================================
+  tl.from('#story-2 .grid-h, #story-2 .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.5, ease: 'expo.out', stagger: 0.03 }, 71.27);
+
+  // B1: Cold open
+  beatIn('#s2-b1', 71.27, { duration: 0.5 });
+  tl.from('#s2-b1 .story-num-big', { x: -120, opacity: 0, duration: 0.65, ease: 'power4.out' }, 71.27);
+  tl.from('#s2-b1 .story-headline', { x: 80, opacity: 0, duration: 0.6, ease: 'power4.out' }, 71.52);
+  beatOut('#s2-b1', 74.24, { duration: 0.35 });
+
+  // B2: Headline hold
+  beatIn('#s2-b2', 74.19, { duration: 0.5 });
+  tl.from('#s2-b2 .hero-headline', { y: 30, opacity: 0, duration: 0.6, ease: 'power4.out' }, 74.32);
+  tl.from('#s2-b2 .label-above', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 74.22);
+  tl.fromTo('#s2-b2 .ghost-img',
+    { scale: 1.05, x: -10 },
+    { scale: 1.10, x: 10, duration: 7.0, ease: 'none' }, 74.24);
+  beatOut('#s2-b2', 81.24, { duration: 0.35 });
+
+  // B3: Quote
+  beatIn('#s2-b3', 81.19, { duration: 0.5 });
+  tl.from('#s2-b3 .quote-mark', { y: -30, opacity: 0, scale: 0.7, duration: 0.5, ease: 'back.out(1.7)' }, 81.20);
+  tl.from('#s2-b3 .quote-text', { y: 30, opacity: 0, duration: 0.6, ease: 'power4.out' }, 81.40);
+  tl.from('#s2-b3 .quote-attr', { y: 18, opacity: 0, duration: 0.4, ease: 'power3.out' }, 82.00);
+  beatOut('#s2-b3', 93.24, { duration: 0.4 });
+
+  // B4: Caption + visual (ken-burns)
+  beatIn('#s2-b4', 93.19, { duration: 0.5 });
+  tl.fromTo('#s2-kb',
+    { scale: 1.05, x: -30, y: -15 },
+    { scale: 1.16, x: 30, y: 15, duration: 12.0, ease: 'none' }, 93.24);
+  tl.from('#s2-b4 .kb-caption', { y: 30, opacity: 0, duration: 0.55, ease: 'power4.out' }, 93.55);
+  beatOut('#s2-b4', 105.24, { duration: 0.4 });
+
+  // B5: Stat
+  beatIn('#s2-b5', 105.19, { duration: 0.5 });
+  tl.from('#s2-b5 .stat-label', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 105.30);
+  tl.from('#s2-b5 .stat-value', { y: 40, opacity: 0, scale: 0.92, duration: 0.6, ease: 'back.out(1.4)' }, 105.50);
+  tl.from('#s2-b5 .stat-sub', { y: 12, opacity: 0, duration: 0.4, ease: 'power3.out' }, 106.40);
+  beatOut('#s2-b5', 114.24, { duration: 0.35 });
+
+  // B6: Takeaway
+  beatIn('#s2-b6', 114.19, { duration: 0.55, ease: 'power4.out' });
+  tl.from('#s2-b6 .tk-label', { y: 16, opacity: 0, duration: 0.4, ease: 'expo.out' }, 114.22);
+  tl.from('#s2-b6 .tk-text', { y: 40, opacity: 0, duration: 0.7, ease: 'power4.out' }, 114.42);
+  tl.from('#s2-b6 .tk-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 115.10);
+  // No exit — hands off to story-3
+
+  // Source chip
+  tl.fromTo('#s2-source', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 74.6);
+  tl.to('#s2-source', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 125.25);
+  tl.set('#s2-source', { opacity: 0 }, 125.55);
+
+  // ============================================================
+  // STORY 3 (125.55 → 176.30)
+  // ============================================================
+  tl.from('#story-3 .grid-h, #story-3 .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.5, ease: 'expo.out', stagger: 0.03 }, 125.58);
+
+  // B1: Cold open
+  beatIn('#s3-b1', 125.58, { duration: 0.5 });
+  tl.from('#s3-b1 .story-num-big', { x: -120, opacity: 0, duration: 0.65, ease: 'power4.out' }, 125.58);
+  tl.from('#s3-b1 .story-headline', { x: 80, opacity: 0, duration: 0.6, ease: 'power4.out' }, 125.83);
+  beatOut('#s3-b1', 128.55, { duration: 0.35 });
+
+  // B2: Headline hold
+  beatIn('#s3-b2', 128.50, { duration: 0.5 });
+  tl.from('#s3-b2 .hero-headline', { y: 30, opacity: 0, duration: 0.6, ease: 'power4.out' }, 128.63);
+  tl.from('#s3-b2 .label-above', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 128.53);
+  tl.fromTo('#s3-b2 .ghost-img',
+    { scale: 1.05, x: -10 },
+    { scale: 1.10, x: 10, duration: 7.0, ease: 'none' }, 128.55);
+  beatOut('#s3-b2', 135.55, { duration: 0.35 });
+
+  // B3: Quote
+  beatIn('#s3-b3', 135.50, { duration: 0.5 });
+  tl.from('#s3-b3 .quote-mark', { y: -30, opacity: 0, scale: 0.7, duration: 0.5, ease: 'back.out(1.7)' }, 135.51);
+  tl.from('#s3-b3 .quote-text', { y: 30, opacity: 0, duration: 0.6, ease: 'power4.out' }, 135.71);
+  tl.from('#s3-b3 .quote-attr', { y: 18, opacity: 0, duration: 0.4, ease: 'power3.out' }, 136.30);
+  beatOut('#s3-b3', 147.55, { duration: 0.4 });
+
+  // B4: Stat-bar
+  beatIn('#s3-b4', 147.50, { duration: 0.5 });
+  tl.from('#s3-b4 .sb-label', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 147.55);
+  tl.from('#s3-b4 .sb-row', { y: 30, opacity: 0, duration: 0.55, ease: 'power4.out' }, 147.75);
+  tl.from('#s3-b4 .sb-cap', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 148.85);
+  beatOut('#s3-b4', 159.55, { duration: 0.4 });
+
+  // B5: Caption + visual (ken-burns)
+  beatIn('#s3-b5', 159.50, { duration: 0.5 });
+  tl.fromTo('#s3-kb',
+    { scale: 1.05, x: -30, y: -15 },
+    { scale: 1.18, x: 30, y: 15, duration: 8.0, ease: 'none' }, 159.55);
+  tl.from('#s3-b5 .kb-caption', { y: 30, opacity: 0, duration: 0.55, ease: 'power4.out' }, 159.85);
+  beatOut('#s3-b5', 167.55, { duration: 0.4 });
+
+  // B6: Takeaway
+  beatIn('#s3-b6', 167.50, { duration: 0.55, ease: 'power4.out' });
+  tl.from('#s3-b6 .tk-label', { y: 16, opacity: 0, duration: 0.4, ease: 'expo.out' }, 167.53);
+  tl.from('#s3-b6 .tk-text', { y: 40, opacity: 0, duration: 0.7, ease: 'power4.out' }, 167.73);
+  tl.from('#s3-b6 .tk-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 168.40);
+  // No exit — hands off to outro
+
+  // Source chip
+  tl.fromTo('#s3-source', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 128.9);
+  tl.to('#s3-source', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 176.0);
+  tl.set('#s3-source', { opacity: 0 }, 176.30);
+
+  // ============================================================
+  // OUTRO (176.30 → 186.12)
+  // ============================================================
+  tl.from('#outro .grid-h, #outro .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.5, ease: 'expo.out', stagger: 0.03 }, 176.33);
+
+  // B1: Hero "AI DAILY"
+  beatIn('#outro-b1', 176.33, { duration: 0.5, ease: 'power4.out' });
+  tl.from('#outro-b1 .hero-title', { y: 60, opacity: 0, duration: 0.65, ease: 'power4.out' }, 176.40);
+  tl.from('#outro-b1 .out-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 176.85);
+  tl.from('#outro-b1 .out-fb', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 177.10);
+  beatOut('#outro-b1', 179.80, { duration: 0.4 });
+
+  // B2: CTA enlarge
+  beatIn('#outro-b2', 179.75, { duration: 0.5, ease: 'power4.out' });
+  tl.from('#outro-b2 .cta-fb', { y: 30, opacity: 0, scale: 0.92, duration: 0.6, ease: 'back.out(1.4)' }, 179.80);
+  tl.from('#outro-b2 .cta-text', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out' }, 180.30);
+  beatOut('#outro-b2', 183.30, { duration: 0.4 });
+
+  // B3: Final CTA pulse — one finite scale tween, no infinite loops
+  beatIn('#outro-b3', 183.25, { duration: 0.5, ease: 'power4.out' });
+  tl.from('#outro-b3 .cta-fb', { y: 24, opacity: 0, duration: 0.5, ease: 'power4.out' }, 183.30);
+  tl.from('#outro-b3 .cta-text', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 183.70);
+  // Single explicit pulse, finite — out and back
+  tl.to('#outro-b3 .cta-fb', { scale: 1.05, duration: 0.5, ease: 'sine.inOut' }, 184.40);
+  tl.to('#outro-b3 .cta-fb', { scale: 1.0, duration: 0.5, ease: 'sine.inOut' }, 184.90);
+
+  // Permitted exit on the final scene
+  tl.to('#outro', { opacity: 0, duration: 0.4, ease: 'power2.in' }, 185.70);
+
+  // ============================================================
+  // 1. Register the timeline FIRST (synchronous)
+  // ============================================================
+  window.__timelines = window.__timelines || {};
+  window.__timelines['ai-daily'] = tl;
+
+  // ============================================================
+  // 2. Register all motion-primitive registrars synchronously
+  // ============================================================
+  registerKineticTweens(tl);
+  registerCountUps(tl);
+  registerScrollFrames(tl);
+  registerStatBars(tl);
+  registerCaptions(tl);
+</script>
+
+</div>
+</body>
+</html>
