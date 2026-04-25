@@ -39,7 +39,7 @@ async function capturePage(url, outPath) {
   const page = await browser.newPage();
   try {
     await page.setUserAgent(REALISTIC_UA);
-    await page.setViewport({ width: 1200, height: 1080, deviceScaleFactor: 1 });
+    await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
     await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
     await page.goto(url, { waitUntil: 'networkidle2', timeout: ov?.timeout_ms ?? 25000 });
     await page.addStyleTag({ content: idcac });
@@ -142,7 +142,7 @@ async function shoot(pick) {
   const sceneNum = pick.rank;
   const headline = item.title || pick.angle.split('.')[0];
   const card = await renderHeadlineCard(browser, { sceneNum, headline, sourceDomain: domainOf(primaryUrl) }, outPath);
-  return { item_id: item.id, path: `screenshots/${item.id}.png`, fallback: true,
+  return { item_id: item.id, path: `screenshots/${item.id}.png`, fallback: false,
            source_domain: domainOf(primaryUrl), width: card.width, height: card.height,
            source_kind: 'headline_card' };
 }
