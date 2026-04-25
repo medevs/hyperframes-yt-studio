@@ -20,7 +20,7 @@ if (!childEnv.PATH?.includes(whisperBinDir)) {
 
 const r = spawnSync('npx', [
   'hyperframes', 'transcribe', wav,
-  '--output', join(workDir, 'transcript.json'),
+  '--dir', workDir,
 ], { encoding: 'utf8', shell: true, stdio: ['ignore', 'inherit', 'inherit'], env: childEnv });
 
 if (r.status !== 0) { console.error('hyperframes transcribe failed'); process.exit(1); }
