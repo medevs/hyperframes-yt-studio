@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap');
+
+:root {
+  --bg-primary: #0A0A0A;
+  --fg-primary: #F5F5F5;
+  --fg-secondary: #A0A0A0;
+  --accent: #0066FF;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg-primary); width: 1200px; height: 1200px; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; }
+
+.card {
+  width: 1200px; height: 1200px;
+  padding: 120px 80px;
+  display: flex; flex-direction: column; justify-content: center; gap: 48px;
+  border-left: 12px solid var(--accent);
+}
+.scene-num {
+  font-size: 200px; font-weight: 800; letter-spacing: -4px; color: var(--accent);
+  font-variant-numeric: tabular-nums; line-height: 0.85;
+}
+.headline {
+  font-size: 96px; font-weight: 800; letter-spacing: -2px; color: var(--fg-primary);
+  line-height: 1.05; max-width: 1000px;
+}
+.source {
+  font-size: 32px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--fg-secondary);
+}
