@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { ItemsFileSchema } from '../pipeline/schemas/items.js';
-import { PicksFileSchema } from '../pipeline/schemas/picks.js';
+import { PickSchema, PicksFileSchema } from '../pipeline/schemas/picks.js';
 import { ClaimsFileSchema } from '../pipeline/schemas/claims.js';
 import { StoryboardFileSchema } from '../pipeline/schemas/storyboard.js';
 import { TimingsFileSchema } from '../pipeline/schemas/timings.js';
@@ -78,21 +78,14 @@ describe('PickSchema primary_source_url', () => {
   };
 
   it('requires primary_source_url', () => {
-    expect(() => {
-      const { PickSchema } = require('../pipeline/schemas/picks.js');
-      PickSchema.parse(base);
-    }).toThrow();
+    expect(() => PickSchema.parse(base)).toThrow();
   });
 
   it('rejects non-URL primary_source_url', () => {
-    expect(() => {
-      const { PickSchema } = require('../pipeline/schemas/picks.js');
-      PickSchema.parse({ ...base, primary_source_url: 'not-a-url' });
-    }).toThrow();
+    expect(() => PickSchema.parse({ ...base, primary_source_url: 'not-a-url' })).toThrow();
   });
 
   it('accepts a valid primary_source_url', () => {
-    const { PickSchema } = require('../pipeline/schemas/picks.js');
     const ok = PickSchema.parse({ ...base, primary_source_url: 'https://openai.com/blog/x' });
     expect(ok.primary_source_url).toBe('https://openai.com/blog/x');
   });
