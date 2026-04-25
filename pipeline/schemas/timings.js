@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+export const EmphasisSchema = z.object({
+  scene_id: z.string(),
+  word: z.string(),
+  start_sec: z.number().nonnegative(),
+  end_sec: z.number().nonnegative(),
+  kind: z.enum(['kinetic', 'caption']),
+});
+
 export const TimingsFileSchema = z.object({
   audio_file: z.string(),
   total_duration_sec: z.number().positive(),
@@ -16,4 +24,5 @@ export const TimingsFileSchema = z.object({
     start_sec: z.number().nonnegative(),
     end_sec: z.number().positive(),
   })).nonempty(),
+  emphases: z.array(EmphasisSchema).optional().default([]),
 });
