@@ -14,7 +14,7 @@ describe('extractOgImageUrl', () => {
     expect(extractOgImageUrl(fx('no-og.html'))).toBeNull();
   });
 
-  it('returns null when og:image content is not a valid URL', () => {
+  it('returns null when og:image is a relative path and no base URL is provided', () => {
     expect(extractOgImageUrl(fx('broken-og.html'))).toBeNull();
   });
 

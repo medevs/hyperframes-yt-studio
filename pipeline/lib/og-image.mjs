@@ -1,4 +1,5 @@
 import { JSDOM } from 'jsdom';
+import { writeFileSync } from 'node:fs';
 
 export function extractOgImageUrl(html, baseUrl) {
   const dom = new JSDOM(html);
@@ -12,6 +13,15 @@ export function extractOgImageUrl(html, baseUrl) {
   }
 }
 
+/**
+ * Fetches an article page, extracts its og:image URL, downloads the image,
+ * and writes it to `outputPath`.
+ *
+ * Returns `{ path, contentType, bytes }` on success, `null` on any failure
+ * (timeout, network error, missing meta tag, non-image content-type, etc.).
+ *
+ * `outputPath`'s parent directory must already exist.
+ */
 export async function fetchOgImage(pageUrl, outputPath, { timeoutMs = 15000 } = {}) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -26,11 +36,12 @@ export async function fetchOgImage(pageUrl, outputPath, { timeoutMs = 15000 } = 
     const img = await fetch(imgUrl, { signal: ctrl.signal }).then(r => r.ok ? r : null);
     if (!img) return null;
     const ct = img.headers.get('content-type') || '';
-    if (!ct.startsWith('image/')) return null;
+    if (!ct.toLowerCase().startsWith('image/')) return null;
     const buf = Buffer.from(await img.arrayBuffer());
-    const { writeFileSync } = await import('node:fs');
     writeFileSync(outputPath, buf);
     return { path: outputPath, contentType: ct, bytes: buf.length };
+  } catch {
+    return null;
   } finally {
     clearTimeout(t);
   }
