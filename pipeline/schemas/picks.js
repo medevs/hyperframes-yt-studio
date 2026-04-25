@@ -7,6 +7,7 @@ export const PickSchema = z.object({
   rationale: z.string(),
   suggested_visuals: z.array(z.string()),
   risk_flags: z.array(z.string()),
+  primary_source_url: z.string().url(),
 });
 
 export const PicksFileSchema = z.object({
