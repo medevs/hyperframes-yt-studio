@@ -29,24 +29,43 @@ Every `index.html` you produce MUST:
   ```html
   <link rel="stylesheet" href="../../assets/motion-primitives.css">
   ```
-- Load GSAP, then `motion-primitives.js`, then your per-composition timeline script:
-  ```html
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
-  <script type="module" src="../../assets/motion-primitives.js"></script>
-  <script>
-    /* per-composition timeline */
-  </script>
-  ```
-- After defining the master timeline, call all 5 registrars before registering on `window.__timelines`:
-  ```js
-  registerKineticTweens(tl);
-  registerCountUps(tl);
-  registerScrollFrames(tl);
-  registerStatBars(tl);
-  registerCaptions(tl);
-  window.__timelines = window.__timelines || {};
-  window.__timelines['ai-daily'] = tl;
-  ```
+- Load GSAP, then inline the motion-primitives IIFE, then your per-composition timeline script — see "Motion-primitives runtime" and "Timeline registration order" sections below.
+
+### Motion-primitives runtime — inline as IIFE, do NOT use external module script
+
+Inline the motion-primitives browser runtime as a `<script>` IIFE in `<head>`. Copy the body of the `if (typeof window !== 'undefined') { ... }` block from `assets/motion-primitives.js` and wrap it in `(function() { ... })();`. The IIFE must define and assign `window.formatBigNumber`, `window.registerKineticTweens`, `window.registerCountUps`, `window.registerScrollFrames`, `window.registerStatBars`, `window.registerCaptions`.
+
+DO NOT use:
+- `<script type="module" src="../../assets/motion-primitives.js">` — ESM modules load asynchronously; the timeline script below would run before the registrars are on `window`.
+- `<script src="../../assets/motion-primitives.js">` (non-module) — the relative path breaks across preview-server vs render-server contexts.
+
+Inlining ensures (a) deterministic load order, (b) no path fragility, (c) renders the composition self-contained.
+
+### Timeline registration order (critical for studio playback)
+
+After defining the master `tl = gsap.timeline({ paused: true })` and adding all `tl.from(...)` / `tl.to(...)` entrance tweens, do these two things in this exact order:
+
+```js
+// 1. Register the timeline FIRST so the studio finds it on synchronous DOM introspection.
+window.__timelines = window.__timelines || {};
+window.__timelines['ai-daily'] = tl;
+
+// 2. Call all 5 motion-primitive registrars synchronously.
+// (This script is at end of body; readyState is never 'loading' here.)
+registerKineticTweens(tl);
+registerCountUps(tl);
+registerScrollFrames(tl);
+registerStatBars(tl);
+registerCaptions(tl);
+```
+
+DO NOT wrap either the `window.__timelines` assignment or the registrar calls in:
+- `document.addEventListener('DOMContentLoaded', ...)`
+- `setTimeout(...)`
+- `requestAnimationFrame(...)`
+- Any other deferred callback
+
+Reason: the hyperframes studio reads `window.__timelines[<composition-id>]` synchronously when the iframe loads. If the timeline is registered later, the studio shows the play button disabled and the timeline ruler stays empty.
 
 ## Per-scene motion budget (enforced by lint)
 
