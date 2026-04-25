@@ -64,7 +64,6 @@ npx hyperframes docs <topic>
 npm test                   # vitest
 npm run setup              # preflight checks
 npm run lint               # hyperframes lint
-npm run validate           # hyperframes validate
 ```
 
 ## Project layout
@@ -135,4 +134,7 @@ Core skills used: `hyperframes`, `hyperframes-cli`, `hyperframes-registry`, `web
 
 ## License
 
-Private project. Not published.
+MIT — see [`LICENSE`](LICENSE).
+
+`vendor/idcac-rules.css` is third-party content under GPL-3.0-or-later; see
+[`vendor/LICENSE-idcac`](vendor/LICENSE-idcac).

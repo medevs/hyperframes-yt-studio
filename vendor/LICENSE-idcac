@@ -1,0 +1,21 @@
+vendor/idcac-rules.css — third-party content
+=============================================
+
+Source:   https://github.com/OhMyGuus/I-Still-Dont-Care-About-Cookies
+Upstream: https://www.i-dont-care-about-cookies.eu/
+License:  GPL-3.0-or-later
+
+The CSS rules in `idcac-rules.css` are derived from the IDCAC (I Still Don't
+Care About Cookies) rule set, which is distributed under the GNU General
+Public License version 3 or (at your option) any later version.
+
+Full GPL-3.0 text: https://www.gnu.org/licenses/gpl-3.0.txt
+
+This project ("AI Daily — YouTube Automation Studio") uses these rules as
+data — applied as a stylesheet to suppress cookie-consent banners during
+headless screenshot capture. The rest of this project is licensed under the
+MIT License (see `../LICENSE`); the GPL-3.0 terms apply only to
+`vendor/idcac-rules.css` and any redistribution of that file.
+
+To update the rules, fetch the latest version from upstream and replace the
+file. Do not modify the rules in place; treat the vendored copy as a snapshot.

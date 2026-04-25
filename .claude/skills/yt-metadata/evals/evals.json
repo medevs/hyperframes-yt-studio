@@ -4,14 +4,14 @@
     {
       "id": 0,
       "name": "normal-run-writes-metadata",
-      "prompt": "The AI Daily video for 2026-04-23 just finished rendering. Write the YouTube upload copy — title, description with chapter timestamps, and tags — for the run. Run folder: C:/Users/ahmed.oublihi/Projects/studio/.claude/skills/yt-research/evals/fixtures/run-fixture-01/. It contains script.md, picks.json, and timings.json. Output filename: metadata.txt.",
+      "prompt": "The AI Daily video for 2026-04-23 just finished rendering. Write the YouTube upload copy — title, description with chapter timestamps, and tags — for the run. Run folder: ./.claude/skills/yt-research/evals/fixtures/run-fixture-01/. It contains script.md, picks.json, and timings.json. Output filename: metadata.txt.",
       "expected_output": "A metadata.txt with TITLE (≤60 chars), DESCRIPTION block, Chapters starting with '00:00 Intro' and using MM:SS timestamps from timings.json exactly, Sources list with 3 URLs matching the script's SOURCES block, and TAGS: line with 8-12 comma-separated lowercase tags, no emoji.",
       "files": []
     },
     {
       "id": 1,
       "name": "casual-prompt-no-file-hints",
-      "prompt": "Can you draft the YouTube upload copy for today's AI Daily? Run is at C:/Users/ahmed.oublihi/Projects/studio/.claude/skills/yt-research/evals/fixtures/run-fixture-01/. I want something I can paste straight into the YouTube upload form — save it as metadata.txt in the output directory you'll be told about.",
+      "prompt": "Can you draft the YouTube upload copy for today's AI Daily? Run is at ./.claude/skills/yt-research/evals/fixtures/run-fixture-01/. I want something I can paste straight into the YouTube upload form — save it as metadata.txt in the output directory you'll be told about.",
       "expected_output": "Same structural requirements as eval-0: valid metadata.txt with title, description+chapters, sources, tags. Tests whether the skill still produces the correct format when the prompt doesn't spell out the file structure.",
       "files": []
     }
