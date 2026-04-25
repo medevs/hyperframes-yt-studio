@@ -3,7 +3,9 @@
   "version": "0.2.0",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -17,6 +19,7 @@
     "jsdom": "^24.0.0",
     "puppeteer": "^22.0.0",
     "rss-parser": "^3.13.0",
+    "sharp": "^0.33.5",
     "zod": "^3.23.0"
   },
   "devDependencies": {

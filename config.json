@@ -28,5 +28,6 @@
     "name": "AI Daily",
     "style_name": "Swiss Pulse",
     "accent_color": "#0066FF"
-  }
+  },
+  "screenshot_overrides": {}
 }

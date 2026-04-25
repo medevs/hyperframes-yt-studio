@@ -26,4 +26,9 @@ export const ConfigSchema = z.object({
     style_name: z.string(),
     accent_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   }),
+  screenshot_overrides: z.record(z.object({
+    hide: z.array(z.string()).optional(),
+    wait_for: z.string().optional(),
+    timeout_ms: z.number().int().positive().optional(),
+  })).default({}),
 });
