@@ -36,6 +36,21 @@ check('config.json valid', () => {
   try { loadConfig(); return { ok: true }; } catch (e) { return { ok: false, msg: e.message }; }
 });
 
+check('whisper-cli available', () => {
+  const whisperBinDir = 'C:\\tools\\whisper';
+  const pathSep = process.platform === 'win32' ? ';' : ':';
+  const env = { ...process.env };
+  if (!env.PATH?.includes(whisperBinDir)) {
+    env.PATH = `${whisperBinDir}${pathSep}${env.PATH ?? ''}`;
+  }
+  const r = spawnSync('whisper-cli', ['--help'], { encoding: 'utf8', shell: true, env });
+  const out = ((r.stdout || '') + (r.stderr || '')).toLowerCase();
+  if (r.status === 0 || out.includes('whisper')) {
+    return { ok: true };
+  }
+  return { ok: false, msg: 'see docs/setup-whisper.md for install instructions' };
+});
+
 let allOk = true;
 for (const c of checks) {
   const r = c.fn();

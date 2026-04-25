@@ -1,0 +1,115 @@
+:root {
+  --bg-primary: #0A0A0A;
+  --bg-secondary: #1A1A1A;
+  --fg-primary: #F5F5F5;
+  --fg-secondary: #A0A0A0;
+  --accent: #0066FF;
+  --accent-warm: #FFB300;
+  --divider: #2A2A2A;
+}
+
+/* KineticWord — entry baseline (GSAP tweens FROM this) */
+.kw {
+  display: inline-block;
+  position: relative;
+  color: var(--accent);
+  font-weight: 800;
+  /* Underline accent that draws in with the word */
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 4px;
+  transition: none; /* GSAP handles all motion */
+}
+
+/* CountUp — visually identical to number-callout, JS drives textContent */
+.count-up {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+}
+
+/* ScrollFrame */
+.scroll-frame {
+  position: relative;
+  width: 1200px;
+  height: 540px;
+  overflow: hidden;
+  border-radius: 4px;
+  outline: 6px solid var(--accent);
+  outline-offset: 0;
+  background: var(--bg-secondary);
+}
+.scroll-frame > img {
+  display: block;
+  width: 1200px;
+  /* height set per-frame from manifest height */
+  will-change: transform;
+}
+
+/* StatBar */
+.stat-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-bar .bar-track {
+  flex: 1;
+  height: 18px;
+  background: var(--divider);
+  position: relative;
+  overflow: hidden;
+}
+.stat-bar .bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: var(--accent);
+  will-change: width;
+}
+.stat-bar .bar-label {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--fg-secondary);
+  min-width: 240px;
+}
+.stat-bar .bar-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--fg-primary);
+  min-width: 120px;
+  text-align: right;
+}
+
+/* CaptionLine */
+.caption-line {
+  position: absolute;
+  left: 120px;
+  right: 120px;
+  bottom: 80px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--fg-primary);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* GridDecorative */
+.grid-decorative {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+}
+.grid-decorative .grid-h, .grid-decorative .grid-v {
+  position: absolute;
+  background: var(--divider);
+}
+.grid-decorative .grid-h { left: 0; right: 0; height: 1px; }
+.grid-decorative .grid-v { top: 0; bottom: 0; width: 1px; }
