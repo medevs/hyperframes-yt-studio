@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { analyzeScreenshot, isAcceptable } from './lib/screenshot-quality.mjs';
 import { checkMotionBudget } from './lib/motion-budget.mjs';
+import { checkSceneGaps } from './lib/scene-gaps.mjs';
 
 const [, , workDir] = process.argv;
 if (!workDir) { console.error('usage: node lint.mjs <work-dir>'); process.exit(2); }
@@ -44,6 +45,11 @@ if (existsSync(indexPath)) {
   for (const w of mb.warnings) {
     console.warn(`motion_budget [warn]: ${w}`);
   }
+  const sg = checkSceneGaps(html);
+  for (const e of sg.errors) {
+    console.error(`scene_gaps: ${e}`);
+    bad++;
+  }
 }
 
 if (bad > 0) {
@@ -51,4 +57,4 @@ if (bad > 0) {
   process.exit(1);
 }
 
-console.log('OK lint + validate + screenshot_quality + motion_budget clean');
+console.log('OK lint + validate + screenshot_quality + motion_budget + scene_gaps clean');
