@@ -79,7 +79,7 @@ Every **story** scene (id `story-*`) must include at least 3 of these 5 budget-c
 | StatBar | `<div class="stat-bar" data-target-pct data-at>` |
 | CaptionLine | `<div class="caption-line" data-at data-end>` |
 
-In addition, every scene boundary requires a `SceneTransition` block (see "Transitions" below). Intro and outro scenes are exempt from the 3-primitive budget but still need transitions to/from neighboring scenes.
+Intro and outro scenes are exempt from the 3-primitive budget. Scene transitions are handled by simple opacity crossfades (see "Transitions" below) — do NOT use shader-transition sub-compositions.
 
 ## Kinetic typography rules
 
@@ -99,7 +99,14 @@ Read `timings.emphases[]` filter `kind: 'caption'`. For each, emit `<div class="
 
 ## Transitions
 
-For every scene boundary (storyboard's `transition_in` field), embed the corresponding shader transition block via `<div data-composition-src="compositions/<id>.html" data-start="<boundary>" data-duration="0.6" data-track-index="2"></div>`. Track-index 2 sits above scene track 1 and audio track 0. Use `cinematic-zoom` for intro→story-1 and `sdf-iris` for between stories. Outro uses crossfade (no shader block) — just rely on the outro scene's entrance + the previous scene's exit-fade-allowed (outro is the only scene allowed to have exit animations per DESIGN.md). The actual files live at `compositions/cinematic-zoom.html` and `compositions/sdf-iris.html`.
+Use simple opacity crossfades — do NOT use shader-transition sub-compositions via `data-composition-src`. **Why:** the shader-transition sub-comps' inlined HTML adds elements with conflicting `id` attributes (`#s2`, `#driver`) and inline `opacity: 0` that break the runtime's clip visibility tracking. The result is an all-black rendered video with audio only — silent failure during render. This was the root cause of the 2026-04-25 render outage; never reintroduce.
+
+For visual continuity between scenes, rely on:
+- Each scene's `gsap.from()` entrance animations (the new scene fades/slides in)
+- Butt-joined scene durations (so there's no black gap between them)
+- The outro scene's permitted exit animation (`tl.to('#outro', { opacity: 0 })`)
+
+If you need richer transitions in the future, build them as inline gsap tweens on the scene elements themselves (`tl.to('#scene-a', { opacity: 0 }, boundary); tl.from('#scene-b', { opacity: 0 }, boundary)`). Stay within the master timeline; do not embed sub-compositions.
 
 ## GridDecorative
 
