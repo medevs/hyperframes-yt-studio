@@ -140,3 +140,41 @@ describe('ScreenshotsManifestSchema width/height/source_kind', () => {
     expect(() => ScreenshotsManifestSchema.parse(bad)).toThrow();
   });
 });
+
+describe('TimingsFileSchema emphases', () => {
+  const baseFile = {
+    audio_file: 'narration.wav',
+    total_duration_sec: 25,
+    scenes: [
+      { id: 'intro', kind: 'intro', start_sec: 0, duration_sec: 5, word_count: 10 },
+      { id: 'story1', kind: 'story', story_num: 1, start_sec: 5, duration_sec: 7, word_count: 15 },
+      { id: 'story2', kind: 'story', story_num: 2, start_sec: 12, duration_sec: 6, word_count: 12 },
+      { id: 'story3', kind: 'story', story_num: 3, start_sec: 18, duration_sec: 4, word_count: 8 },
+      { id: 'outro', kind: 'outro', start_sec: 22, duration_sec: 3, word_count: 5 },
+    ],
+    words: [{ text: 'a', start_sec: 0, end_sec: 0.1 }],
+  };
+
+  it('accepts a file with no emphases (back-compat)', () => {
+    expect(() => TimingsFileSchema.parse(baseFile)).not.toThrow();
+  });
+
+  it('accepts a file with emphases populated', () => {
+    const f = {
+      ...baseFile,
+      emphases: [
+        { scene_id: 'intro', word: 'GPT-5.5', start_sec: 1.2, end_sec: 1.6, kind: 'kinetic' },
+        { scene_id: 'intro', word: 'today', start_sec: 2.0, end_sec: 2.3, kind: 'caption' },
+      ],
+    };
+    expect(() => TimingsFileSchema.parse(f)).not.toThrow();
+  });
+
+  it('rejects unknown emphasis kind', () => {
+    const f = {
+      ...baseFile,
+      emphases: [{ scene_id: 'intro', word: 'x', start_sec: 0, end_sec: 0.1, kind: 'sparkle' }],
+    };
+    expect(() => TimingsFileSchema.parse(f)).toThrow();
+  });
+});
