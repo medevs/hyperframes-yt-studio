@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..', '..'); // C:/Users/ahmed.oublihi/Projects/studio
+const ROOT = join(__dirname, '..', '..');
 const FIXTURE_01 = join(ROOT, '.claude/skills/yt-research/evals/fixtures/run-fixture-01');
 const FIXTURE_02 = join(ROOT, '.claude/skills/yt-research/evals/fixtures/run-fixture-02');
 const VALIDATOR = join(ROOT, 'pipeline/validate-json.mjs');

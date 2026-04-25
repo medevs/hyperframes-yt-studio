@@ -4,7 +4,8 @@
 
 Source: https://github.com/OhMyGuus/I-Still-Dont-Care-About-Cookies (or original IDCAC at https://www.i-dont-care-about-cookies.eu/)
 Pinned: 2026-04-25
-License: GPL-3.0 (rules), code is MIT — used here as data only
+License: GPL-3.0-or-later — see `LICENSE-idcac` for attribution and terms.
 
-Updated by re-running Task 4 of `docs/superpowers/plans/2026-04-25-screenshot-quality.md`.
-Bumping cadence: monthly or when capture quality degrades.
+Used as data only — applied as a stylesheet during headless screenshot capture
+to hide cookie-consent banners. Bump cadence: monthly or when capture quality
+degrades. To update, fetch the latest rules file from upstream and overwrite.
