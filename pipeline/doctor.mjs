@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { loadConfig } from './lib/sources.js';
+import { withWhisperOnPath } from './lib/whisper-path.js';
 
 const checks = [];
 function check(name, fn) { checks.push({ name, fn }); }
@@ -29,7 +30,7 @@ check('hyperframes installed', () => {
 });
 
 check('DESIGN.md exists', () => {
-  return existsSync('DESIGN.md') ? { ok: true } : { ok: false, msg: 'create DESIGN.md per Task 0.4' };
+  return existsSync('DESIGN.md') ? { ok: true } : { ok: false, msg: 'create DESIGN.md describing the visual identity (see README "Design system")' };
 });
 
 check('config.json valid', () => {
@@ -37,18 +38,13 @@ check('config.json valid', () => {
 });
 
 check('whisper-cli available', () => {
-  const whisperBinDir = 'C:\\tools\\whisper';
-  const pathSep = process.platform === 'win32' ? ';' : ':';
-  const env = { ...process.env };
-  if (!env.PATH?.includes(whisperBinDir)) {
-    env.PATH = `${whisperBinDir}${pathSep}${env.PATH ?? ''}`;
-  }
+  const env = withWhisperOnPath();
   const r = spawnSync('whisper-cli', ['--help'], { encoding: 'utf8', shell: true, env });
   const out = ((r.stdout || '') + (r.stderr || '')).toLowerCase();
   if (r.status === 0 || out.includes('whisper')) {
     return { ok: true };
   }
-  return { ok: false, msg: 'see docs/setup-whisper.md for install instructions' };
+  return { ok: false, msg: 'install whisper.cpp and put whisper-cli on PATH (or set HYPERFRAMES_WHISPER_DIR); see README troubleshooting' };
 });
 
 let allOk = true;

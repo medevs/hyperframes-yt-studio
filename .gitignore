@@ -23,10 +23,10 @@ docs/
 .claude/skills/hyperframes-registry/
 .claude/skills/website-to-hyperframes/
 
-# Skill eval workspaces — regeneratable; re-run grade_runs.mjs + build_benchmark.mjs to rebuild.
+# Skill eval workspaces and reports — regeneratable; see tools/skill-evals/README.md.
 .claude/skills/*-workspace/
-.claude/skills/review.html
-.claude/skills/combined_benchmark.json
+tools/skill-evals/review.html
+tools/skill-evals/combined_benchmark.json
 
 # Per-user Claude Code overrides
 .claude/settings.local.json

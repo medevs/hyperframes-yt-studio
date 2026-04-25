@@ -34,7 +34,7 @@ Verify your environment:
 
 ```bash
 npm install
-npm run setup        # preflight checks: Node, ffmpeg, hyperframes doctor, config
+npm run doctor       # preflight checks: Node, ffmpeg, hyperframes doctor, config, whisper-cli
 ```
 
 ## Commands
@@ -62,7 +62,7 @@ npx hyperframes docs <topic>
 
 ```bash
 npm test                   # vitest
-npm run setup              # preflight checks
+npm run doctor             # preflight checks
 npm run lint               # hyperframes lint
 ```
 
