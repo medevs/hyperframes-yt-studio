@@ -9,7 +9,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "setup": "node pipeline/setup.mjs",
+    "doctor": "node pipeline/doctor.mjs",
     "lint": "hyperframes lint"
   },
   "dependencies": {
