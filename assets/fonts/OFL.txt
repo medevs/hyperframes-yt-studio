@@ -1,0 +1,4 @@
+Inter is licensed under the SIL Open Font License 1.1.
+Source: https://github.com/rsms/inter
+License: https://github.com/rsms/inter/blob/master/LICENSE.txt
+Distribution used: @fontsource/inter (https://fontsource.org/fonts/inter), latin subset.

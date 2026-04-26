@@ -3,11 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <title>AI Daily — 2026-04-25</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<!-- Local Inter font (latin subset, ~90 KB total). No network round-trip. -->
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/inter-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/inter-500.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/inter-600.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/inter-800.woff2">
 <link rel="stylesheet" href="assets/motion-primitives.css">
 <style>
+  @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('assets/fonts/inter-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('assets/fonts/inter-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('assets/fonts/inter-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Inter'; font-style: normal; font-weight: 800; font-display: swap; src: url('assets/fonts/inter-800.woff2') format('woff2'); }
+
   :root {
     --bg-primary: #0A0A0A;
     --bg-secondary: #1A1A1A;
