@@ -1,12 +1,28 @@
 // Diagnostic: open the HyperFrames studio in headless Chrome and capture
 // everything needed to explain why the preview canvas is black for the user.
 import puppeteer from 'puppeteer';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
+function pickMostRecentRun() {
+  try {
+    const entries = readdirSync('work', { withFileTypes: true })
+      .filter(e => e.isDirectory())
+      .map(e => ({ name: e.name, mtime: statSync(join('work', e.name)).mtimeMs }))
+      .sort((a, b) => b.mtime - a.mtime);
+    return entries[0]?.name;
+  } catch { return null; }
+}
 const STUDIO = process.env.STUDIO_URL || 'http://localhost:3002/';
-const RUN_ID = process.env.RUN_ID || '2026-04-25-1';
-const OUT = '/tmp/preview-diag';
+const RUN_ID = process.argv[2] || process.env.RUN_ID || pickMostRecentRun();
+if (!RUN_ID) { console.error('diagnose-preview: no RUN_ID resolved — pass argv[2] or set $RUN_ID'); process.exit(2); }
+const OUT = join(tmpdir(), 'preview-diag');
 mkdirSync(OUT, { recursive: true });
+
+console.log(`[diagnose-preview] run-id=${RUN_ID}  studio=${STUDIO}  out=${OUT}`);
+console.log(`[diagnose-preview] heavy probe: console + network + iframe state, screenshots at +3/+8/+15s`);
+
 
 const log = [];
 const net = [];
@@ -49,20 +65,20 @@ const projectsApi = await page.evaluate(async () => {
 consoleLog('api', `GET /api/projects -> ${projectsApi.status}`);
 log.push('  body: ' + projectsApi.body.slice(0, 500));
 
-// The studio auto-loaded the last project (2026-04-25-1). Just wait.
+// The studio auto-loaded the last project. Just wait.
 consoleLog('flow', `current URL after settle: ${page.url()}`);
 await page.screenshot({ path: `${OUT}/02-project.png`, fullPage: false });
 
 // Try fetching the preview endpoint directly to see what the server returns
-const previewProbe = await page.evaluate(async () => {
+const previewProbe = await page.evaluate(async (runId) => {
   try {
-    const r = await fetch('/api/projects/2026-04-25-1/preview', { method: 'GET' });
+    const r = await fetch(`/api/projects/${runId}/preview`, { method: 'GET' });
     const body = await r.text();
     return { status: r.status, headers: Object.fromEntries(r.headers.entries()), bodyHead: body.slice(0, 800), bodyLen: body.length };
   } catch (e) {
     return { error: e.message };
   }
-});
+}, RUN_ID);
 consoleLog('preview-probe', JSON.stringify(previewProbe, null, 2));
 
 // Look for composition cards in the left sidebar and click "index"

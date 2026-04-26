@@ -6,11 +6,30 @@
 //   4. Play button NOT disabled
 //   5. Screenshot at t=8s of intro scene contains non-black pixels in canvas region
 import puppeteer from 'puppeteer';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
-const STUDIO = 'http://localhost:3002/';
-const OUT = process.platform === 'win32' ? 'C:/Users/ahmed/AppData/Local/Temp/proof-fix' : '/tmp/proof-fix';
+// Run-id is informational here (proof-fix probes studio root, which auto-loads
+// the most-recent project). argv[2] takes precedence; falls back to most-recent
+// work/<dir>/ by mtime so the banner reflects what the studio is serving.
+function pickMostRecentRun() {
+  try {
+    const entries = readdirSync('work', { withFileTypes: true })
+      .filter(e => e.isDirectory())
+      .map(e => ({ name: e.name, mtime: statSync(join('work', e.name)).mtimeMs }))
+      .sort((a, b) => b.mtime - a.mtime);
+    return entries[0]?.name || '(none)';
+  } catch { return '(no work/ dir)'; }
+}
+const RUN_ID = process.argv[2] || process.env.RUN_ID || pickMostRecentRun();
+const STUDIO = process.env.STUDIO_URL || 'http://localhost:3002/';
+const OUT = join(tmpdir(), 'proof-fix');
 mkdirSync(OUT, { recursive: true });
+
+console.log(`[proof-fix] run-id=${RUN_ID}  studio=${STUDIO}  out=${OUT}`);
+console.log(`[proof-fix] checks: player ready, duration>0, play btn enabled, no CDN injection`);
+
 
 const browser = await puppeteer.launch({
   headless: 'new',

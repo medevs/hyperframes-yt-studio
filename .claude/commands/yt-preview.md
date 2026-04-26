@@ -7,31 +7,39 @@ Precondition: `.last-run` exists; `$RUN/index.html` exists (from `/yt-build`); l
 
 If `$RUN/index.html` does NOT exist, refuse and tell the user to run `/yt-build` first — there is nothing to preview before the composition step.
 
-**Single-server discipline:** Always kill all existing preview servers before starting a new one. The user does not want to think about which port belongs to which run. We always launch a fresh studio on a deterministic port (3002).
+**Strict port discipline:** the studio ALWAYS runs on **port 3000**. If anything else is on 3000, kill it first — never fall back to a higher port. (HF preview's default fallback behaviour silently lands on 3002, 3004, … which leaves multiple node processes running and slows the laptop. We refuse that.)
 
 ```bash
 RUN=$(cat .last-run)
 test -f "$RUN/index.html" || { echo "ERROR: $RUN/index.html missing — run /yt-build first."; exit 1; }
-# Kill any lingering studios from prior runs (other projects, prior attempts)
+
+# 1. Kill HF-tracked servers
 npx hyperframes preview --kill-all 2>/dev/null || true
-# Defense-in-depth: --kill-all only kills servers it tracked itself; sweep ports 3002-3010 for stragglers (Windows-safe)
-node -e "
-const { spawnSync } = require('node:child_process');
-const out = spawnSync('netstat', ['-ano'], { encoding: 'utf8' }).stdout || '';
-const pids = new Set();
-for (const line of out.split(/\r?\n/)) {
-  const m = line.match(/^\s*TCP\s+\S*:(300[2-9]|3010)\s+\S+\s+LISTENING\s+(\d+)/);
-  if (m) pids.add(m[2]);
-}
-for (const pid of pids) {
-  try { process.kill(parseInt(pid, 10)); } catch {}
-}
-" 2>/dev/null || true
+
+# 2. Kill ANYTHING listening on 3000 (Windows + Unix-safe via PowerShell on Windows, lsof on Unix).
+#    HF's --kill-all only kills servers it tracked itself; this catches strays.
+if [ "$OS" = "Windows_NT" ] || command -v powershell >/dev/null 2>&1; then
+  powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force -ErrorAction SilentlyContinue }"
+else
+  lsof -ti :3000 2>/dev/null | xargs -r kill -9 2>/dev/null || true
+fi
 sleep 1
-npx hyperframes preview "$RUN" --port 3002 --force-new
+
+# 3. Verify 3000 is free; refuse to start otherwise (do NOT fall back to a different port)
+if command -v powershell >/dev/null 2>&1; then
+  STILL=$(powershell -NoProfile -Command "(Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue | Measure-Object).Count")
+  if [ "$STILL" != "0" ]; then echo "ERROR: port 3000 still in use; investigate before retrying"; exit 1; fi
+fi
+
+# 4. Bind on port 3000 only
+npx hyperframes preview "$RUN" --port 3000 --force-new
 ```
 
-Run that command via `Bash(run_in_background: true)`. The studio prints `Studio    http://localhost:3002` on stdout — surface that URL verbatim to the user.
+Run that command via `Bash(run_in_background: true)`. The studio prints `Studio    http://localhost:3000` on stdout — surface that URL verbatim to the user. **If HF logs `Port 3000 is in use, using N instead`, that is a hard failure** — kill the studio you just started, investigate what's holding 3000 (`Get-NetTCPConnection -LocalPort 3000`), and tell the user. Do not let the user end up with a studio on a non-3000 port.
+
+After surfacing the URL, give this guidance:
+
+> **In the studio sidebar, click `index` to play the full video.** The other entries (`intro`, `story-1`, `story-2`, `story-3`, `outro`) are sub-compositions — they will appear empty in isolation because they share CSS and audio from the root. This is expected with the v4 nested-sub-composition pattern (see HANDOFF-2026-04-26.md).
 
 When the user is satisfied with the preview, invoke `/yt-render` to produce the final MP4.
 

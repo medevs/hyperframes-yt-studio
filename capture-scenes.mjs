@@ -2,11 +2,29 @@
 // pausing at each requested timestamp. Workaround for GSAP paused-seek
 // not initializing fromTo() state on a never-played timeline.
 import puppeteer from 'puppeteer';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
-const PREVIEW = 'http://localhost:3002/api/projects/2026-04-25-1/preview';
-const OUT = 'C:/Users/ahmed/AppData/Local/Temp/scene-snapshots';
+// Run-id resolution: argv[2] > $RUN_ID > most-recent work/<dir>/ by mtime.
+function pickMostRecentRun() {
+  try {
+    const entries = readdirSync('work', { withFileTypes: true })
+      .filter(e => e.isDirectory())
+      .map(e => ({ name: e.name, mtime: statSync(join('work', e.name)).mtimeMs }))
+      .sort((a, b) => b.mtime - a.mtime);
+    return entries[0]?.name;
+  } catch { return null; }
+}
+const RUN_ID = process.argv[2] || process.env.RUN_ID || pickMostRecentRun();
+if (!RUN_ID) { console.error('capture-scenes: no RUN_ID resolved — pass argv[2] or set $RUN_ID'); process.exit(2); }
+const PREVIEW = `${process.env.STUDIO_URL?.replace(/\/$/, '') || 'http://localhost:3002'}/api/projects/${RUN_ID}/preview`;
+const OUT = join(tmpdir(), 'scene-snapshots');
 mkdirSync(OUT, { recursive: true });
+
+console.log(`[capture-scenes] run-id=${RUN_ID}  preview=${PREVIEW}  out=${OUT}`);
+console.log(`[capture-scenes] writes 17 per-scene PNGs by playing tl at 20x then scrubbing`);
+
 
 const SHOTS = [
   { label: 'intro-hero',         t: 1.0  },
@@ -81,7 +99,7 @@ for (const { label, t } of SHOTS) {
     tl.seek(seekT, false);
   }, t);
   await new Promise((r) => setTimeout(r, 250));
-  const file = `${OUT}/${String(t).padStart(6, '0')}-${label}.png`;
+  const file = join(OUT, `${String(t).padStart(6, '0')}-${label}.png`);
   await page.screenshot({ path: file, fullPage: false });
   console.log(`  shot t=${t}s → ${file}`);
 }

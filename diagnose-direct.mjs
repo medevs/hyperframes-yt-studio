@@ -2,11 +2,28 @@
 // If this works, the composition is fine and the bug is in the studio's iframe wiring.
 // If this also fails, the composition has an error.
 import puppeteer from 'puppeteer';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
-const URL_PREVIEW = 'http://localhost:3002/api/projects/2026-04-25-1/preview';
-const OUT = process.platform === 'win32' ? 'C:/Users/ahmed/AppData/Local/Temp/preview-direct' : '/tmp/preview-direct';
+function pickMostRecentRun() {
+  try {
+    const entries = readdirSync('work', { withFileTypes: true })
+      .filter(e => e.isDirectory())
+      .map(e => ({ name: e.name, mtime: statSync(join('work', e.name)).mtimeMs }))
+      .sort((a, b) => b.mtime - a.mtime);
+    return entries[0]?.name;
+  } catch { return null; }
+}
+const RUN_ID = process.argv[2] || process.env.RUN_ID || pickMostRecentRun();
+if (!RUN_ID) { console.error('diagnose-direct: no RUN_ID resolved — pass argv[2] or set $RUN_ID'); process.exit(2); }
+const URL_PREVIEW = `${process.env.STUDIO_URL?.replace(/\/$/, '') || 'http://localhost:3002'}/api/projects/${RUN_ID}/preview`;
+const OUT = join(tmpdir(), 'preview-direct');
 mkdirSync(OUT, { recursive: true });
+
+console.log(`[diagnose-direct] run-id=${RUN_ID}  preview=${URL_PREVIEW}  out=${OUT}`);
+console.log(`[diagnose-direct] loads preview iframe directly (bypasses studio chrome)`);
+
 
 const log = [];
 const say = (...a) => { const s = a.join(' '); console.log(s); log.push(s); };
