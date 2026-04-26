@@ -1,0 +1,80 @@
+<template id="intro-template">
+<div data-composition-id="intro" data-width="1920" data-height="1080" data-start="0" data-duration="14.67">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:540px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:960px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <div id="intro-b1" class="beat beat-hero clip" data-start="0" data-duration="2.6" data-track-index="2">
+    <div class="date-label">April 25 · 2026</div>
+    <div class="hero-title"><span class="ai">AI</span> DAILY</div>
+    <div class="accent-rule"></div>
+  </div>
+
+  <div id="intro-b2" class="beat teaser clip" data-start="2.6" data-duration="3.4" data-track-index="2">
+    <div class="teaser-meta">Today · 01</div>
+    <div class="teaser-num">01</div>
+    <div class="teaser-text">DeepSeek V4 — largest open-weight model</div>
+  </div>
+
+  <div id="intro-b3" class="beat teaser clip" data-start="6.0" data-duration="3.5" data-track-index="2">
+    <div class="teaser-meta">Today · 02</div>
+    <div class="teaser-num">02</div>
+    <div class="teaser-text">OpenAI ships GPT-5.5</div>
+  </div>
+
+  <div id="intro-b4" class="beat teaser clip" data-start="9.5" data-duration="5.17" data-track-index="2">
+    <div class="teaser-meta">Today · 03</div>
+    <div class="teaser-num">03</div>
+    <div class="teaser-text">Mythos: as capable as top human security researchers</div>
+  </div>
+
+  <script>
+  (function() {
+    const tl = gsap.timeline({ paused: true });
+
+    function beatIn(sel, at, opts) {
+      opts = opts || {};
+      tl.fromTo(sel,
+        { opacity: 0, scale: opts.fromScale || 0.96, y: opts.fromY != null ? opts.fromY : 24 },
+        { opacity: 1, scale: 1, y: 0, duration: opts.duration || 0.45, ease: opts.ease || 'expo.out' },
+        at);
+    }
+    function beatOut(sel, at, opts) {
+      opts = opts || {};
+      tl.to(sel, { opacity: 0, scale: opts.toScale || 1.04, duration: opts.duration || 0.35, ease: 'power2.in' },
+        at - (opts.duration || 0.35));
+    }
+
+    tl.from('#intro .grid-h, #intro .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.6, ease: 'expo.out', stagger: 0.04 }, 0.1);
+
+    beatIn('#intro-b1', 0.05, { duration: 0.55, ease: 'power4.out' });
+    tl.from('#intro-b1 .hero-title', { y: 60, opacity: 0, duration: 0.7, ease: 'power4.out' }, 0.15);
+    tl.from('#intro-b1 .accent-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 0.55);
+    tl.from('#intro-b1 .date-label', { y: 18, opacity: 0, duration: 0.4, ease: 'power3.out' }, 0.4);
+    beatOut('#intro-b1', 2.6, { duration: 0.35 });
+
+    beatIn('#intro-b2', 2.55, { duration: 0.5, ease: 'power4.out' });
+    tl.from('#intro-b2 .teaser-num', { x: -80, opacity: 0, duration: 0.5, ease: 'expo.out' }, 2.55);
+    tl.from('#intro-b2 .teaser-text', { x: 60, opacity: 0, duration: 0.55, ease: 'power4.out' }, 2.7);
+    beatOut('#intro-b2', 6.0, { duration: 0.35 });
+
+    beatIn('#intro-b3', 5.95, { duration: 0.5, ease: 'power4.out' });
+    tl.from('#intro-b3 .teaser-num', { x: -80, opacity: 0, duration: 0.5, ease: 'expo.out' }, 5.95);
+    tl.from('#intro-b3 .teaser-text', { x: 60, opacity: 0, duration: 0.55, ease: 'power4.out' }, 6.10);
+    beatOut('#intro-b3', 9.5, { duration: 0.35 });
+
+    beatIn('#intro-b4', 9.45, { duration: 0.5, ease: 'power4.out' });
+    tl.from('#intro-b4 .teaser-num', { x: -80, opacity: 0, duration: 0.5, ease: 'expo.out' }, 9.45);
+    tl.from('#intro-b4 .teaser-text', { x: 60, opacity: 0, duration: 0.55, ease: 'power4.out' }, 9.60);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines['intro'] = tl;
+  })();
+  </script>
+</div>
+</template>

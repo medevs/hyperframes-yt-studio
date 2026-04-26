@@ -1,0 +1,129 @@
+<template id="story-3-template">
+<div data-composition-id="story-3" data-width="1920" data-height="1080" data-start="0" data-duration="50.75">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <div id="s3-b1" class="beat beat-cold-open clip" data-start="0" data-duration="3.0" data-track-index="2">
+    <div class="story-num-big">03</div>
+    <div class="story-headline">Mythos × Firefox</div>
+  </div>
+
+  <div id="s3-b2" class="beat beat-headline-hold clip" data-start="3.0" data-duration="7.0" data-track-index="2">
+    <img class="ghost-img" src="screenshots/rss-036a76cbfdc2cef6.png" alt="">
+    <div class="ghost-overlay"></div>
+    <div class="label-above">Story 03 · Ars Technica</div>
+    <div class="hero-headline">Mythos × Firefox</div>
+  </div>
+
+  <div id="s3-b3" class="beat beat-quote clip" data-start="10.0" data-duration="12.0" data-track-index="2">
+    <div class="quote-mark">&ldquo;</div>
+    <div class="quote-text">
+      Every bit as <span class="kw" data-emphasize-at="3.19">CAPABLE</span>.
+    </div>
+    <div class="quote-attr">— Mozilla, on Anthropic's Mythos</div>
+  </div>
+
+  <div id="s3-b4" class="beat beat-statbar clip" data-start="22.0" data-duration="12.0" data-track-index="2">
+    <div class="sb-label">Codebase Coverage</div>
+    <div class="sb-row">
+      <div class="stat-bar" data-target-pct="100" data-at="22.5">
+        <div class="bar-label">Audit Reach</div>
+        <div class="bar-track"><div class="bar-fill"></div></div>
+        <div class="bar-value">∞</div>
+      </div>
+    </div>
+    <div class="sb-cap">Every codebase now in range</div>
+  </div>
+
+  <div id="s3-b5" class="beat beat-visual clip" data-start="34.0" data-duration="8.0" data-track-index="2">
+    <img id="s3-kb" class="kb-img" src="screenshots/rss-036a76cbfdc2cef6.png" alt="Mozilla Mythos article">
+    <div class="kb-vignette"></div>
+    <div class="kb-caption">
+      Every codebase now in range
+    </div>
+  </div>
+
+  <div id="s3-b6" class="beat beat-takeaway clip" data-start="42.0" data-duration="8.75" data-track-index="2">
+    <div class="tk-label">For Builders</div>
+    <div class="tk-text">Assume an AI auditor is already running.</div>
+    <div class="tk-rule"></div>
+  </div>
+
+  <div class="source-chip" id="s3-source">arstechnica.com</div>
+
+  <script>
+  (function() {
+    const tl = gsap.timeline({ paused: true });
+
+    function beatIn(sel, at, opts) {
+      opts = opts || {};
+      tl.fromTo(sel,
+        { opacity: 0, scale: opts.fromScale || 0.96, y: opts.fromY != null ? opts.fromY : 24 },
+        { opacity: 1, scale: 1, y: 0, duration: opts.duration || 0.45, ease: opts.ease || 'expo.out' },
+        at);
+    }
+    function beatOut(sel, at, opts) {
+      opts = opts || {};
+      tl.to(sel, { opacity: 0, scale: opts.toScale || 1.04, duration: opts.duration || 0.35, ease: 'power2.in' },
+        at - (opts.duration || 0.35));
+    }
+
+    tl.from('#story-3 .grid-h, #story-3 .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.5, ease: 'expo.out', stagger: 0.03 }, 0.03);
+
+    // B1 cold-open
+    beatIn('#s3-b1', 0.03, { duration: 0.5 });
+    tl.from('#s3-b1 .story-num-big', { x: -120, opacity: 0, duration: 0.65, ease: 'power4.out' }, 0.03);
+    tl.from('#s3-b1 .story-headline', { x: 80, opacity: 0, duration: 0.6, ease: 'power4.out' }, 0.28);
+    beatOut('#s3-b1', 3.0, { duration: 0.35 });
+
+    // B2 headline-hold
+    beatIn('#s3-b2', 2.95, { duration: 0.5 });
+    tl.from('#s3-b2 .hero-headline', { y: 30, opacity: 0, duration: 0.6, ease: 'power4.out' }, 3.08);
+    tl.from('#s3-b2 .label-above', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 2.98);
+    tl.fromTo('#s3-b2 .ghost-img',
+      { scale: 1.05, x: -10 },
+      { scale: 1.10, x: 10, duration: 7.0, ease: 'none' }, 3.0);
+    beatOut('#s3-b2', 10.0, { duration: 0.35 });
+
+    // B3 quote
+    beatIn('#s3-b3', 9.95, { duration: 0.5 });
+    tl.from('#s3-b3 .quote-mark', { y: -30, opacity: 0, scale: 0.7, duration: 0.5, ease: 'back.out(1.7)' }, 9.96);
+    tl.from('#s3-b3 .quote-text', { y: 30, opacity: 0, duration: 0.6, ease: 'power4.out' }, 10.16);
+    tl.from('#s3-b3 .quote-attr', { y: 18, opacity: 0, duration: 0.4, ease: 'power3.out' }, 10.75);
+    beatOut('#s3-b3', 22.0, { duration: 0.4 });
+
+    // B4 stat-bar
+    beatIn('#s3-b4', 21.95, { duration: 0.5 });
+    tl.from('#s3-b4 .sb-label', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 22.0);
+    tl.from('#s3-b4 .sb-row', { y: 30, opacity: 0, duration: 0.55, ease: 'power4.out' }, 22.20);
+    tl.from('#s3-b4 .sb-cap', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 23.30);
+    beatOut('#s3-b4', 34.0, { duration: 0.4 });
+
+    // B5 visual ken-burns
+    beatIn('#s3-b5', 33.95, { duration: 0.5 });
+    tl.fromTo('#s3-kb',
+      { scale: 1.05, x: -30, y: -15 },
+      { scale: 1.18, x: 30, y: 15, duration: 8.0, ease: 'none' }, 34.0);
+    tl.from('#s3-b5 .kb-caption', { y: 30, opacity: 0, duration: 0.55, ease: 'power4.out' }, 34.30);
+    beatOut('#s3-b5', 42.0, { duration: 0.4 });
+
+    // B6 takeaway
+    beatIn('#s3-b6', 41.95, { duration: 0.55, ease: 'power4.out' });
+    tl.from('#s3-b6 .tk-label', { y: 16, opacity: 0, duration: 0.4, ease: 'expo.out' }, 41.98);
+    tl.from('#s3-b6 .tk-text', { y: 40, opacity: 0, duration: 0.7, ease: 'power4.out' }, 42.18);
+    tl.from('#s3-b6 .tk-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 42.85);
+
+    // Source chip
+    tl.fromTo('#s3-source', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 3.35);
+    tl.to('#s3-source', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 50.45);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines['story-3'] = tl;
+  })();
+  </script>
+</div>
+</template>

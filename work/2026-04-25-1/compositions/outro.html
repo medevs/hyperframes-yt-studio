@@ -1,0 +1,70 @@
+<template id="outro-template">
+<div data-composition-id="outro" data-width="1920" data-height="1080" data-start="0" data-duration="9.82">
+  <div class="grid-decorative">
+    <div class="grid-h" style="top:80px"></div>
+    <div class="grid-h" style="top:1000px"></div>
+    <div class="grid-v" style="left:120px"></div>
+    <div class="grid-v" style="left:1800px"></div>
+  </div>
+
+  <div id="outro-b1" class="beat beat-outro-hero clip" data-start="0" data-duration="3.5" data-track-index="2">
+    <div class="hero-title"><span class="ai">AI</span> DAILY</div>
+    <div class="out-rule"></div>
+    <div class="out-fb">For Builders</div>
+  </div>
+
+  <div id="outro-b2" class="beat beat-outro-cta clip" data-start="3.5" data-duration="3.5" data-track-index="2">
+    <div class="cta-fb">For Builders</div>
+    <div class="cta-text">Subscribe for daily AI news</div>
+  </div>
+
+  <div id="outro-b3" class="beat beat-outro-cta clip" data-start="7.0" data-duration="2.82" data-track-index="2">
+    <div class="cta-fb">Subscribe</div>
+    <div class="cta-text">For daily AI news, built for builders</div>
+  </div>
+
+  <script>
+  (function() {
+    const tl = gsap.timeline({ paused: true });
+
+    function beatIn(sel, at, opts) {
+      opts = opts || {};
+      tl.fromTo(sel,
+        { opacity: 0, scale: opts.fromScale || 0.96, y: opts.fromY != null ? opts.fromY : 24 },
+        { opacity: 1, scale: 1, y: 0, duration: opts.duration || 0.45, ease: opts.ease || 'expo.out' },
+        at);
+    }
+    function beatOut(sel, at, opts) {
+      opts = opts || {};
+      tl.to(sel, { opacity: 0, scale: opts.toScale || 1.04, duration: opts.duration || 0.35, ease: 'power2.in' },
+        at - (opts.duration || 0.35));
+    }
+
+    tl.from('#outro .grid-h, #outro .grid-v', { scaleX: 0, transformOrigin: 'left', duration: 0.5, ease: 'expo.out', stagger: 0.03 }, 0.03);
+
+    // B1 hero
+    beatIn('#outro-b1', 0.03, { duration: 0.5, ease: 'power4.out' });
+    tl.from('#outro-b1 .hero-title', { y: 60, opacity: 0, duration: 0.65, ease: 'power4.out' }, 0.10);
+    tl.from('#outro-b1 .out-rule', { scaleX: 0, transformOrigin: 'center', duration: 0.5, ease: 'expo.out' }, 0.55);
+    tl.from('#outro-b1 .out-fb', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 0.80);
+    beatOut('#outro-b1', 3.5, { duration: 0.4 });
+
+    // B2 CTA enlarge
+    beatIn('#outro-b2', 3.45, { duration: 0.5, ease: 'power4.out' });
+    tl.from('#outro-b2 .cta-fb', { y: 30, opacity: 0, scale: 0.92, duration: 0.6, ease: 'back.out(1.4)' }, 3.50);
+    tl.from('#outro-b2 .cta-text', { y: 20, opacity: 0, duration: 0.5, ease: 'power3.out' }, 4.00);
+    beatOut('#outro-b2', 7.0, { duration: 0.4 });
+
+    // B3 final CTA pulse
+    beatIn('#outro-b3', 6.95, { duration: 0.5, ease: 'power4.out' });
+    tl.from('#outro-b3 .cta-fb', { y: 24, opacity: 0, duration: 0.5, ease: 'power4.out' }, 7.00);
+    tl.from('#outro-b3 .cta-text', { y: 16, opacity: 0, duration: 0.4, ease: 'power3.out' }, 7.40);
+    tl.to('#outro-b3 .cta-fb', { scale: 1.05, duration: 0.5, ease: 'sine.inOut' }, 8.10);
+    tl.to('#outro-b3 .cta-fb', { scale: 1.0, duration: 0.5, ease: 'sine.inOut' }, 8.60);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines['outro'] = tl;
+  })();
+  </script>
+</div>
+</template>
