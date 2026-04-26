@@ -35,11 +35,29 @@ fi
 npx hyperframes preview "$RUN" --port 3000 --force-new
 ```
 
-Run that command via `Bash(run_in_background: true)`. The studio prints `Studio    http://localhost:3000` on stdout — surface that URL verbatim to the user. **If HF logs `Port 3000 is in use, using N instead`, that is a hard failure** — kill the studio you just started, investigate what's holding 3000 (`Get-NetTCPConnection -LocalPort 3000`), and tell the user. Do not let the user end up with a studio on a non-3000 port.
+Run that command via `Bash(run_in_background: true)`. The studio prints `Studio    http://localhost:3000` on stdout. **If HF logs `Port 3000 is in use, using N instead`, that is a hard failure** — kill the studio you just started, investigate what's holding 3000 (`Get-NetTCPConnection -LocalPort 3000`), and tell the user. Do not let the user end up with a studio on a non-3000 port.
+
+**The URL to surface to the user is the synced-preview shell, NOT the studio root:**
+
+```
+http://localhost:3000/api/projects/<RUN-ID>/preview/audio-preview.html
+```
+
+Where `<RUN-ID>` is the basename of `$RUN` (e.g. `2026-04-26-1`). The audio-preview.html template is copied into every run-dir by `pipeline/build-run-dir.mjs`. It wraps `<hyperframes-player>` and proactively flips audio ownership to "parent" via `_promoteToParentProxy()`, bypassing the HF studio iframe cold-load race that otherwise leaves the voiceover silent.
+
+Verify before surfacing — both URLs must respond:
+
+```bash
+RUN_ID=$(basename "$RUN")
+curl -sf -o /dev/null "http://localhost:3000/api/projects/$RUN_ID/preview/audio-preview.html" || { echo "ERROR: audio-preview.html not found in $RUN — re-run /yt-build"; exit 1; }
+echo "Open: http://localhost:3000/api/projects/$RUN_ID/preview/audio-preview.html"
+```
 
 After surfacing the URL, give this guidance:
 
-> **In the studio sidebar, click `index` to play the full video.** The other entries (`intro`, `story-1`, `story-2`, `story-3`, `outro`) are sub-compositions — they will appear empty in isolation because they share CSS and audio from the root. This is expected with the v4 nested-sub-composition pattern (see HANDOFF-2026-04-26.md).
+> **Open the URL above** to play the full video with synced voiceover. The page resolves the HF player asset at runtime and promotes audio ownership to the parent, so the voiceover plays reliably from the first second.
+>
+> If you'd rather inspect individual scenes or scrub frame-by-frame, the studio root is at `http://localhost:3000`. Click `index` in the sidebar — but be aware that the studio shell has a known cold-load race where the voiceover may never start; that's the reason the synced-preview shell exists.
 
 When the user is satisfied with the preview, invoke `/yt-render` to produce the final MP4.
 

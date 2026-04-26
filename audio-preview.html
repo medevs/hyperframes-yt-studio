@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HyperFrames — synced preview (audio + visual)</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #0A0A0A; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; color: #F5F5F5; }
+  body { display: flex; flex-direction: column; }
+  header { padding: 12px 24px; background: #1A1A1A; border-bottom: 1px solid #2A2A2A; font-size: 13px; color: #A0A0A0; letter-spacing: 1.5px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+  header b { color: #F5F5F5; letter-spacing: -0.5px; text-transform: none; font-size: 15px; }
+  header .accent { color: #0066FF; }
+  header .status { font-size: 11px; }
+  main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; min-height: 0; }
+  hyperframes-player { width: 100%; height: 100%; max-width: calc((100vh - 100px) * 16 / 9); max-height: calc(100vw * 9 / 16); }
+</style>
+</head>
+<body>
+<header>
+  <span><b id="title">HyperFrames synced preview</b> &nbsp; · &nbsp; <span class="accent">parent-audio mode</span></span>
+  <span class="status" id="status">initializing…</span>
+</header>
+<main>
+  <hyperframes-player id="player" width="1920" height="1080" controls></hyperframes-player>
+</main>
+<script type="module">
+// Why this file exists:
+//   The HF studio iframe runtime has a cold-load race where audio.play()
+//   never gets called, so the voiceover stays silent. The HF player has a
+//   documented fallback path: the parent can promote audio ownership to
+//   itself ("_audioOwner = parent") and play the adopted <audio> element
+//   directly, bypassing the iframe race entirely.
+//
+//   We trigger that promotion proactively rather than waiting for the
+//   iframe to fail. The iframe's <audio data-start> still gets discovered
+//   and adopted by the player's _setupParentMedia(), so by the time the
+//   player is ready, _parentMedia[] already has the narration clip — we
+//   just flip the owner from "runtime" → "parent".
+
+const status = document.getElementById('status');
+const titleEl = document.getElementById('title');
+function setStatus(t) { status.textContent = t; }
+
+// Derive project preview src from this page's own URL.
+// We are served at: /api/projects/<run-id>/preview/audio-preview.html
+// Player src must be:    /api/projects/<run-id>/preview
+const previewBase = location.pathname.replace(/\/audio-preview\.html$/, '');
+const runId = (previewBase.match(/\/projects\/([^/]+)\//) || [,'unknown'])[1];
+titleEl.textContent = `HyperFrames — ${runId} · synced preview`;
+
+// Resolve the HF studio's hashed player asset at runtime so this file
+// survives HF version upgrades. The studio's index HTML references its
+// main bundle (index-<hash>.js); that bundle in turn references the
+// player asset (hyperframes-player-<hash>.js). We follow the chain.
+async function resolvePlayerAsset() {
+  const studioIndex = await fetch('/').then(r => r.text());
+  const indexMatch = studioIndex.match(/\/assets\/index-[A-Za-z0-9_-]+\.js/);
+  if (!indexMatch) throw new Error('cannot find studio index bundle on /');
+  const indexSrc = await fetch(indexMatch[0]).then(r => r.text());
+  const playerMatch = indexSrc.match(/hyperframes-player-[A-Za-z0-9_-]+\.js/);
+  if (!playerMatch) throw new Error('cannot find player asset in studio bundle');
+  return `/assets/${playerMatch[0]}`;
+}
+
+setStatus('resolving HF player asset…');
+const playerUrl = await resolvePlayerAsset();
+setStatus(`loading player from ${playerUrl}`);
+await import(playerUrl);
+
+const player = document.getElementById('player');
+player.setAttribute('src', previewBase);
+
+function promote() {
+  if (!player || !player._promoteToParentProxy) {
+    setStatus('player not ready, retry…');
+    return false;
+  }
+  if (player._audioOwner !== 'parent') {
+    player._promoteToParentProxy();
+    setStatus(`audio-owner=parent  ·  ${(player._parentMedia||[]).length} clip(s) adopted`);
+  } else {
+    setStatus(`already parent  ·  ${(player._parentMedia||[]).length} clip(s)`);
+  }
+  return true;
+}
+
+// Promote on ready event, with fallback timeouts in case the event is missed.
+player.addEventListener('ready', () => { setStatus('player ready'); setTimeout(promote, 100); });
+setTimeout(() => { if (player._audioOwner !== 'parent') promote(); }, 3000);
+setTimeout(() => { if (player._audioOwner !== 'parent') promote(); }, 6000);
+</script>
+</body>
+</html>

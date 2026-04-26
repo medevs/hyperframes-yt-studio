@@ -8,7 +8,10 @@ if (!workDir) { console.error('usage: node build-run-dir.mjs <work-dir>'); proce
 // without it, the studio cannot detect the project and `npx hyperframes preview`
 // shows a disabled play button. hyperframes.json carries paths config; DESIGN.md
 // is helpful context for AI agents iterating in the run-dir.
-for (const f of ['meta.json', 'hyperframes.json', 'DESIGN.md']) {
+// audio-preview.html is the synced video+audio preview shell that bypasses the
+// HF studio iframe cold-load race (which silently leaves voiceover unplayed);
+// served at /api/projects/<run-id>/preview/audio-preview.html.
+for (const f of ['meta.json', 'hyperframes.json', 'DESIGN.md', 'audio-preview.html']) {
   if (existsSync(f)) copyFileSync(f, join(workDir, f));
 }
 if (existsSync('assets')) cpSync('assets', join(workDir, 'assets'), { recursive: true });
