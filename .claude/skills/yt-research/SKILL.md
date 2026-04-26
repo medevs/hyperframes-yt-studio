@@ -46,6 +46,17 @@ If the news article doesn't link a clear primary source, set `primary_source_url
 
 Write to `<run-dir>/picks.json`. Schema: `pipeline/schemas/picks.js`. Must parse cleanly.
 
+Top-level shape (all three keys are REQUIRED — `date` is easy to forget and the validator will reject the file without it):
+
+```json
+{
+  "date": "<YYYY-MM-DD>",
+  "picks": [ /* exactly 3 */ ],
+  "rejected": [ /* may be empty [] */ ]
+}
+```
+
+- `date` — the run date in `YYYY-MM-DD` form. Derive it from the run-dir name (e.g. `work/2026-04-25-1` → `"2026-04-25"`); do not use `Date.now()` or "today" inferences.
 - **Exactly 3 picks**, ranked 1 (lead) to 3.
 - Each pick:
   - `item_id` — must exist in items.json
@@ -55,7 +66,7 @@ Write to `<run-dir>/picks.json`. Schema: `pipeline/schemas/picks.js`. Must parse
   - `suggested_visuals` — 2–3 short strings (e.g. `["benchmark chart", "API changelog"]`)
   - `primary_source_url` — canonical announcement URL per story (see above for guidance)
   - `risk_flags` — any of: `"rumor_only"`, `"single_source"`, `"unverifiable_claim"`, `"potential_copyright"`. Empty if none apply.
-- `rejected` — any strong-but-not-picked candidates with a short reason.
+- `rejected` — any strong-but-not-picked candidates with a short reason. May be `[]` but the key must be present.
 
 ## Hard rules
 

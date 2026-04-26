@@ -11,8 +11,8 @@ Write `script.md`, `claims.json`, `storyboard.json`, and `storyboard.md` for tod
 
 ## Before writing
 
-1. Read `DESIGN.md` at the repo root. It defines the **Swiss Pulse** brand — colors, type scale, motion tokens. Every visual choice in the storyboard must trace back to it.
-2. If you haven't loaded the Hyperframes skill this session, invoke it via the Skill tool (`/hyperframes`). Its house-style and motion references are what makes the storyboard usable downstream.
+1. Read `DESIGN.md` at the repo root. It defines the **Swiss Pulse** brand — colors, type scale, motion tokens. Every visual choice in the storyboard must trace back to it. `DESIGN.md` is the canonical source for storyboard direction.
+2. **Optional, project-dependent:** If — and only if — the `hyperframes` skill appears in your available-skills list for this session, invoke it via the Skill tool for richer house-style and motion references. **Do not invoke `/hyperframes` blindly** — the skill is shipped as an external Hyperframes plugin (`npx hyperframes skills`) and is not present in every checkout. Calling it when not installed errors with `Unknown skill: hyperframes`. If it is not installed, skip this step and rely on `DESIGN.md` plus `npx hyperframes docs <topic>` (CLI-shipped reference, no network) — that combination is sufficient to produce a valid storyboard.
 3. Read every article in full before writing narration. Claims are grounded in article text, not summaries.
 
 ## Inputs
